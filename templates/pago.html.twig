@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+
+{% block content %}
+	{% include 'partials/alerts.html.twig' %}
+		<form id="redsys_form" action="{{ redsys_url }}" method="POST">
+            <input type="hidden" name="Ds_SignatureVersion" value="{{ params.Ds_SignatureVersion }}">
+            <input type="hidden" name="Ds_MerchantParameters" value="{{ params.Ds_MerchantParameters }}">
+            <input type="hidden" name="Ds_Signature" value="{{ params.Ds_Signature }}">
+        </form>
+
+        <script>
+            document.getElementById('redsys_form').submit();
+        </script>			
+{% endblock %}
+
+{% block vendor %}
+		
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Autenticación de correo (SPF/DKIM/DMARC){% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+    <section class="card">
+      <div class="card-body">
+        <h3 class="mb-3">Configuración de autenticación de correo</h3>
+        {{ form_start(form) }}
+          <h5 class="mt-3">Credenciales SMTP</h5>
+          <div class="row g-3">
+            <div class="col-lg-4">
+              {{ form_label(form.smtpHost) }}
+              {{ form_widget(form.smtpHost, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.smtpHost) }}
+              {{ form_help(form.smtpHost) }}
+            </div>
+            <div class="col-lg-2">
+              {{ form_label(form.smtpPort) }}
+              {{ form_widget(form.smtpPort, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.smtpPort) }}
+              {{ form_help(form.smtpPort) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.smtpEncryption) }}
+              {{ form_widget(form.smtpEncryption, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.smtpEncryption) }}
+              {{ form_help(form.smtpEncryption) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.smtpAuthMode) }}
+              {{ form_widget(form.smtpAuthMode, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.smtpAuthMode) }}
+              {{ form_help(form.smtpAuthMode) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.smtpUsername) }}
+              {{ form_widget(form.smtpUsername, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.smtpUsername) }}
+              {{ form_help(form.smtpUsername) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.smtpPassword) }}
+              {{ form_widget(form.smtpPassword, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.smtpPassword) }}
+              {{ form_help(form.smtpPassword) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.replyToEmail) }}
+              {{ form_widget(form.replyToEmail, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.replyToEmail) }}
+              {{ form_help(form.replyToEmail) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.fromEmail) }}
+              {{ form_widget(form.fromEmail, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.fromEmail) }}
+              {{ form_help(form.fromEmail) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.fromName) }}
+              {{ form_widget(form.fromName, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.fromName) }}
+              {{ form_help(form.fromName) }}
+            </div>
+          </div>
+
+          <hr/>
+
+          <div class="row g-3">
+            <div class="col-lg-6">
+              {{ form_label(form.mailDomain) }}
+              {{ form_widget(form.mailDomain, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.mailDomain) }}
+              {{ form_help(form.mailDomain) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.dkimSelector) }}
+              {{ form_widget(form.dkimSelector, {'attr': {'class':'form-control'}}) }}
+              <small class="form-text text-muted">Ej.: <code>mail</code> o <code>default</code></small>
+              {{ form_help(form.dkimSelector) }}
+            </div>
+          </div>
+
+          <hr/>
+
+          <h5 class="mt-3">SPF</h5>
+          <div class="row g-3">
+            <div class="col-lg-6">
+              {{ form_label(form.spfIncludes) }}
+              {{ form_widget(form.spfIncludes, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.spfIncludes) }}
+              {{ form_help(form.spfIncludes) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.spfIpv4) }}
+              {{ form_widget(form.spfIpv4, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.spfIpv4) }}
+              {{ form_help(form.spfIpv4) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.spfIpv6) }}
+              {{ form_widget(form.spfIpv6, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.spfIpv6) }}
+              {{ form_help(form.spfIpv6) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.spfPolicy) }}
+              {{ form_widget(form.spfPolicy, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.spfPolicy) }}
+              {{ form_help(form.spfPolicy) }}
+            </div>
+          </div>
+
+          <hr/>
+
+          <h5 class="mt-3">DMARC</h5>
+          <div class="row g-3">
+            <div class="col-lg-3">
+              {{ form_label(form.dmarcPolicy) }}
+              {{ form_widget(form.dmarcPolicy, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.dmarcPolicy) }}
+              {{ form_help(form.dmarcPolicy) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.dmarcRua) }}
+              {{ form_widget(form.dmarcRua, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.dmarcRua) }}
+              {{ form_help(form.dmarcRua) }}
+            </div>
+            <div class="col-lg-4">
+              {{ form_label(form.dmarcRuf) }}
+              {{ form_widget(form.dmarcRuf, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.dmarcRuf) }}
+              {{ form_help(form.dmarcRuf) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.dmarcSubdomainPolicy) }}
+              {{ form_widget(form.dmarcSubdomainPolicy, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.dmarcSubdomainPolicy) }}
+              {{ form_help(form.dmarcSubdomainPolicy) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.dmarcAdkim) }}
+              {{ form_widget(form.dmarcAdkim, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.dmarcAdkim) }}
+              {{ form_help(form.dmarcAdkim) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.dmarcAspf) }}
+              {{ form_widget(form.dmarcAspf, {'attr': {'class':'form-select'}}) }}
+              {{ form_errors(form.dmarcAspf) }}
+              {{ form_help(form.dmarcAspf) }}
+            </div>
+            <div class="col-lg-3">
+              {{ form_label(form.dmarcPct) }}
+              {{ form_widget(form.dmarcPct, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.dmarcPct) }}
+              {{ form_help(form.dmarcPct) }}
+            </div>
+          </div>
+
+          <hr/>
+
+          <h5 class="mt-3">Correo de prueba</h5>
+          <div class="row g-3 align-items-end">
+            <div class="col-lg-4">
+              {{ form_label(form.testRecipient) }}
+              {{ form_widget(form.testRecipient, {'attr': {'class':'form-control'}}) }}
+              {{ form_errors(form.testRecipient) }}
+              {{ form_help(form.testRecipient) }}
+            </div>
+            <div class="col-lg-4">
+              {% set sendTestAttr = {'class': 'btn btn-info'} %}
+              {% if not mailSetupReady %}
+                {% set sendTestAttr = sendTestAttr|merge({'disabled':'disabled','title':'Configura host, puerto, credenciales SMTP, remitente y dominio para activar la prueba.'}) %}
+              {% endif %}
+              {{ form_widget(form.sendTest, {'attr': sendTestAttr}) }}
+            </div>
+            <div class="col-lg-12">
+              <small class="text-muted">Se enviará un mensaje simple usando la configuración SMTP del cliente para comprobar que todo funciona correctamente.</small>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            {{ form_widget(form.generateDkim) }}
+            {{ form_widget(form.check) }}
+            {{ form_widget(form.save) }}
+          </div>
+
+        {{ form_end(form) }}
+      </div>
+    </section>
+  </div>
+</div>
+
+{% if dnsRecords is not empty %}
+<div class="row mt-4">
+  <div class="col">
+    <section class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Registros DNS a publicar</h5>
+          <button class="btn btn-outline-primary btn-sm" id="copy-all">Copiar todo</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Host</th>
+                <th>Valor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for rec in dnsRecords %}
+              {% set recordCheck = (checkResults|default([]) | filter(r => r.host == rec.host and r.type == rec.type)|first) %}
+              {% set status = recordCheck.status ?? '—' %}
+              {% set found = recordCheck.found ?? [] %}
+              {% set suggested = recordCheck.suggested ?? null %}
+              <tr>
+                <td><code>{{ rec.type }}</code></td>
+                <td><code>{{ rec.host }}</code></td>
+                <td style="max-width: 700px;">
+                  <pre class="mb-0 small code-block">{{ rec.value }}</pre>
+                </td>
+                <td>
+                  {% if status == 'ok' %}
+                    <span class="badge bg-success">OK</span>
+                  {% elseif status == 'mismatch' %}
+                    <span class="badge bg-warning text-dark">Difiere</span>
+                  {% elseif status == 'missing' %}
+                    <span class="badge bg-danger">No encontrado</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Sin comprobar</span>
+                  {% endif %}
+                  {% if found is not empty %}
+                    <div class="small text-muted mt-1">Encontrado:</div>
+                    <div class="small text-break">
+                      {% for f in found %}<div><code>{{ f }}</code></div>{% endfor %}
+                    </div>
+                  {% endif %}
+                  {% if status == 'mismatch' and suggested %}
+                    <div class="small text-muted mt-2">Combinado sugerido:</div>
+                    <div class="small text-break"><code>{{ suggested }}</code></div>
+                  {% endif %}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary copy-btn" data-value="{{ rec.value }}">Copiar</button>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block specific_vendor %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const domainInput = document.querySelector('#mail_auth_mailDomain');
+      const ruaInput = document.querySelector('#mail_auth_dmarcRua');
+      const rufInput = document.querySelector('#mail_auth_dmarcRuf');
+      let lastRua = ruaInput ? ruaInput.value.trim() : '';
+      let lastRuf = rufInput ? rufInput.value.trim() : '';
+
+      const buildMailto = (prefix, domain) => domain ? `mailto:${prefix}@${domain}` : '';
+      const shouldReplace = (input, lastGenerated) => {
+        if (!input) {
+          return false;
+        }
+        const current = input.value.trim();
+        if (!current) {
+          return true;
+        }
+        return current === lastGenerated;
+      };
+
+      const updateDmarcAddresses = () => {
+        if (!domainInput) {
+          return;
+        }
+        const domain = domainInput.value.trim();
+        if (!domain) {
+          return;
+        }
+
+        const defaultRua = buildMailto('dmarc-reports', domain);
+        if (shouldReplace(ruaInput, lastRua) && ruaInput) {
+          ruaInput.value = defaultRua;
+          lastRua = defaultRua;
+        }
+
+        const defaultRuf = buildMailto('dmarc-failures', domain);
+        if (shouldReplace(rufInput, lastRuf) && rufInput) {
+          rufInput.value = defaultRuf;
+          lastRuf = defaultRuf;
+        }
+      };
+
+      updateDmarcAddresses();
+
+      if (domainInput) {
+        ['change', 'blur'].forEach(eventName => {
+          domainInput.addEventListener(eventName, updateDmarcAddresses);
+        });
+      }
+
+      if (ruaInput) {
+        ruaInput.addEventListener('input', () => {
+          lastRua = ruaInput.value.trim();
+        });
+      }
+      if (rufInput) {
+        rufInput.addEventListener('input', () => {
+          lastRuf = rufInput.value.trim();
+        });
+      }
+
+      // Copiar valor individual
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-value');
+          navigator.clipboard.writeText(val).then(() => {
+            btn.textContent = 'Copiado';
+            setTimeout(() => btn.textContent = 'Copiar', 1200);
+          });
+        });
+      });
+      // Copiar todo
+      const copyAll = document.getElementById('copy-all');
+      if (copyAll) {
+        copyAll.addEventListener('click', () => {
+          const blocks = Array.from(document.querySelectorAll('.code-block')).map(el => el.textContent.trim());
+          navigator.clipboard.writeText(blocks.join('\n\n')).then(() => {
+            copyAll.textContent = 'Copiado';
+            setTimeout(() => copyAll.textContent = 'Copiar todo', 1200);
+          });
+        });
+      }
+    });
+  </script>
+{% endblock %}

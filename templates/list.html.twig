@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <form method="post" class="w-100">
+        <div class="card-body">
+            <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                <a href="{{ path_to_add }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Añadir
+                </a>
+
+                {# Exportación por GET #}
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                        <li>
+                            <a class="btn btn-outline-danger btn-sm w-100 mb-2" href="{{ path('app_list', app.request.query.all | merge({ entity: entity, format: 'pdf' })) }}">
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </a>
+                        </li>
+                        <li>
+                            <a class="btn btn-outline-success btn-sm w-100" href="{{ path('app_list', app.request.query.all | merge({ entity: entity, format: 'excel' })) }}">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-responsive-md table-hover mb-0">
+                <thead>
+                    <tr>
+                        {% for field, options in pagination.field_titles %}
+                            <th>
+                                <label class="form-label small">{{ options.title }}</label>
+                                <input type="text" name="filters[{{ field }}]" value="{{ filters[field]|default('') }}" class="form-control form-control-sm" />
+                            </th>
+                        {% endfor %}
+                        <th class="align-bottom">
+                            <button class="btn btn-primary btn-sm w-100" type="submit">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                            <a href="{{ path('app_list', { entity: entity }) }}" class="btn btn-secondary btn-sm w-100">
+                                <i class="fas fa-eraser"></i> Resetear
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pagination.items %}
+                        <tr {% if item.row_url is defined %}class="clickable-row" data-href="{{ item.row_url }}"{% endif %}>
+                            {% for field, options in pagination.field_titles %}
+                                {% set value = attribute(item.entity, field) %}
+                                {% set type = options.type|default('text') %}
+
+                                <td>
+                                    {% if type == 'bool' %}
+                                        {% if value %}
+                                            <button type="button" class="btn btn-success"><i class="fas fa-check"></i></button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-danger"><i class="fas fa-xmark"></i></button>
+                                        {% endif %}
+                                    {% elseif type == 'date' %}
+                                        {{ value ? value|date('Y-m-d H:i') : '(vacío)' }}
+                                    {% elseif type == 'list' %}
+                                        {{ value is iterable ? value|join(', ') : value }}
+                                    {% elseif type == 'html' %}
+                                        {{ value|raw }}
+                                    {% elseif type == 'badge' %}
+                                        {% set color = attribute(item.entity, 'color') %}
+                                        <span class="badge" style="background-color: {{ color }}; color: white;">{{ value }}</span>
+                                    {% else %}
+                                        {% if value is null %}
+                                            <em>(vacío)</em>
+                                        {% elseif value is iterable %}
+                                            {{ value|join(', ') }}
+                                        {% elseif value is same as(true) %}
+                                            Sí
+                                        {% elseif value is same as(false) %}
+                                            No
+                                        {% elseif value.timestamp is defined %}
+                                            {{ value|date('Y-m-d H:i') }}
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+
+                            <td>
+                                {% if item.links is defined %}
+                                    {% for link in item.links %}
+                                        <a href="{{ link.url }}"
+                                           class="btn btn-{{ link.color|default('primary') }} btn-sm mb-1 me-1"
+                                           title="{{ link.text }}">
+                                            {% if link.icon is defined %}
+                                                <i class="fas {{ link.icon }}"></i>
+                                            {% endif %}
+                                            {{ link.text }}
+                                        </a>
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="{{ pagination.field_titles|length + 1 }}">No hay resultados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row align-items-center mt-3">
+                <div class="col-auto">
+                    <form method="get" id="limitForm">
+                        <label for="limitSelect" class="form-label me-2">Elementos por página:</label>
+                        <select name="limit" id="limitSelect" class="form-select d-inline-block w-auto" onchange="document.getElementById('limitForm').submit()">
+                            {% for opt in [5,10,25,50,100] %}
+                                <option value="{{ opt }}" {% if opt == limit %}selected{% endif %}>{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+
+                        {# Mantener otros parámetros GET para no perder filtros ni página al cambiar límite #}
+                        {% for key, value in app.request.query.all %}
+                            {% if key != 'limit' %}
+                                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                            {% endif %}
+                        {% endfor %}
+                    </form>
+                </div>
+
+                <div class="col">
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        {# Primera y Anterior #}
+                        {% if pagination.current_page > 1 %}
+                            <a href="?page=1{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Primera</a>
+                            <a href="?page={{ pagination.current_page - 1 }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Anterior</a>
+                        {% endif %}
+
+                        {# Páginas numéricas dinámicas #}
+                        {% set start = max(1, pagination.current_page - 1) %}
+                        {% set end = min(pagination.total_pages, pagination.current_page + 1) %}
+
+                        {% if start > 1 %}
+                            <a href="?page=1{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">1</a>
+                            {% if start > 2 %}
+                                <span class="btn btn-outline-secondary disabled">…</span>
+                            {% endif %}
+                        {% endif %}
+
+                        {% for i in start..end %}
+                            {% if i == pagination.current_page %}
+                                <span class="btn btn-primary">{{ i }}</span>
+                            {% else %}
+                                <a href="?page={{ i }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-primary">{{ i }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if end < pagination.total_pages %}
+                            {% if end < pagination.total_pages - 1 %}
+                                <span class="btn btn-outline-secondary disabled">…</span>
+                            {% endif %}
+                            <a href="?page={{ pagination.total_pages }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">{{ pagination.total_pages }}</a>
+                        {% endif %}
+
+                        {# Siguiente y Última #}
+                        {% if pagination.current_page < pagination.total_pages %}
+                            <a href="?page={{ pagination.current_page + 1 }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Siguiente</a>
+                            <a href="?page={{ pagination.total_pages }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Última</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block specific_vendor %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('tr.clickable-row').forEach(function (row) {
+                row.addEventListener('click', function () {
+                    const href = row.getAttribute('data-href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+

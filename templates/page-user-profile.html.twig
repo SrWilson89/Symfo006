@@ -1,0 +1,1120 @@
+<!doctype html>
+<html class="fixed">
+	<head>
+
+		<!-- Basic -->
+		<meta charset="UTF-8">
+
+		<title>User Profile | Porto Admin - Responsive HTML5 Template</title>
+
+		<meta name="keywords" content="HTML5 Admin Template" />
+		<meta name="description" content="Porto Admin - Responsive HTML5 Template">
+		<meta name="author" content="okler.net">
+
+		<!-- Mobile Metas -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+		<!-- Web Fonts  -->
+		<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+
+		<!-- Vendor CSS -->
+		<link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css" />
+		<link rel="stylesheet" href="/assets/vendor/animate/animate.compat.css">
+		<link rel="stylesheet" href="/assets/vendor/font-awesome/css/all.min.css" />
+		<link rel="stylesheet" href="/assets/vendor/boxicons/css/boxicons.min.css" />
+		<link rel="stylesheet" href="/assets/vendor/magnific-popup/magnific-popup.css" />
+		<link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.css" />
+
+		<!-- Theme CSS -->
+		<link rel="stylesheet" href="/assets/css/theme.css" />
+
+		<!-- Skin CSS -->
+		<link rel="stylesheet" href="/assets/css/skins/default.css" />
+
+		<!-- Theme Custom CSS -->
+		<link rel="stylesheet" href="/assets/css/custom.css">
+
+		<!-- Head Libs -->
+		<script src="/assets/vendor/modernizr/modernizr.js"></script>
+
+	</head>
+	<body>
+		<section class="body">
+
+			<!-- start: header -->
+			<header class="header">
+				<div class="logo-container">
+					<a href="../4.3.0" class="logo">
+						<img src="img/AZPC.png" width="40" height="40" alt="Porto Admin" />
+					</a>
+
+					<div class="d-md-none toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
+						<i class="fas fa-bars" aria-label="Toggle sidebar"></i>
+					</div>
+
+				</div>
+
+				<!-- start: search & user box -->
+				<div class="header-right d-flex align-items-center justify-content-between gap-3 flex-wrap">
+
+					{% if is_granted('IS_IMPERSONATOR') %}
+						{% set impersonatedName = ((app.user.nombre ?? '') ~ ' ' ~ (app.user.apellidos ?? ''))|trim %} 
+						{% if impersonatedName is empty %}
+							{% set impersonatedName = app.user.email %}
+						{% endif %}
+
+						<!-- Badge alineado a la izquierda -->
+						<div class="impersonation-badge d-flex align-items-center gap-3">
+							<span class="badge bg-warning text-dark d-flex align-items-center gap-2 py-2 px-3 mb-0">
+								<i class="fas fa-user-secret"></i>
+								<span>Impersonando a {{ impersonatedName }}</span>
+							</span>
+							<a class="btn btn-sm btn-outline-dark" href="{{ impersonation_exit_path(path('app_index'))}}">
+								<i class="fas fa-user-check"></i> Volver a mi rol
+							</a>
+						</div>
+					{% endif %}
+
+					<!-- Buscador a la derecha del badge -->
+					<form action="pages-search-results.html" class="search nav-form">
+						<div class="input-group">
+							<input type="text" class="form-control" name="q" id="q" placeholder="Search...">
+							<button class="btn btn-default" type="submit"><i class="bx bx-search"></i></button>
+						</div>
+					</form>
+
+					<span class="separator"></span>
+
+					<ul class="notifications">
+						<li>
+							<a href="#" class="dropdown-toggle notification-icon" data-bs-toggle="dropdown">
+								<i class="bx bx-list-ol"></i>
+								<span class="badge">3</span>
+							</a>
+
+							<div class="dropdown-menu notification-menu large">
+								<div class="notification-title">
+									<span class="float-end badge badge-default">3</span>
+									Tasks
+								</div>
+
+								<div class="content">
+									<ul>
+										<li>
+											<p class="clearfix mb-1">
+												<span class="message float-start">Generating Sales Report</span>
+												<span class="message float-end text-dark">60%</span>
+											</p>
+											<div class="progress progress-xs light">
+												<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+											</div>
+										</li>
+
+										<li>
+											<p class="clearfix mb-1">
+												<span class="message float-start">Importing Contacts</span>
+												<span class="message float-end text-dark">98%</span>
+											</p>
+											<div class="progress progress-xs light">
+												<div class="progress-bar" role="progressbar" aria-valuenow="98" aria-valuemin="0" aria-valuemax="100" style="width: 98%;"></div>
+											</div>
+										</li>
+
+										<li>
+											<p class="clearfix mb-1">
+												<span class="message float-start">Uploading something big</span>
+												<span class="message float-end text-dark">33%</span>
+											</p>
+											<div class="progress progress-xs light mb-1">
+												<div class="progress-bar" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width: 33%;"></div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li>
+							<a href="#" class="dropdown-toggle notification-icon" data-bs-toggle="dropdown">
+								<i class="bx bx-envelope"></i>
+								<span class="badge">4</span>
+							</a>
+
+							<div class="dropdown-menu notification-menu">
+								<div class="notification-title">
+									<span class="float-end badge badge-default">230</span>
+									Messages
+								</div>
+
+								<div class="content">
+									<ul>
+										<li>
+											<a href="#" class="clearfix">
+												<figure class="image">
+													<img src="img/!sample-user.jpg" alt="Joseph Doe Junior" class="rounded-circle" />
+												</figure>
+												<span class="title">Joseph Doe</span>
+												<span class="message">Lorem ipsum dolor sit.</span>
+											</a>
+										</li>
+										<li>
+											<a href="#" class="clearfix">
+												<figure class="image">
+													<img src="img/!sample-user.jpg" alt="Joseph Junior" class="rounded-circle" />
+												</figure>
+												<span class="title">Joseph Junior</span>
+												<span class="message truncate">Truncated message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet lacinia orci. Proin vestibulum eget risus non luctus. Nunc cursus lacinia lacinia. Nulla molestie malesuada est ac tincidunt. Quisque eget convallis diam, nec venenatis risus. Vestibulum blandit faucibus est et malesuada. Sed interdum cursus dui nec venenatis. Pellentesque non nisi lobortis, rutrum eros ut, convallis nisi. Sed tellus turpis, dignissim sit amet tristique quis, pretium id est. Sed aliquam diam diam, sit amet faucibus tellus ultricies eu. Aliquam lacinia nibh a metus bibendum, eu commodo eros commodo. Sed commodo molestie elit, a molestie lacus porttitor id. Donec facilisis varius sapien, ac fringilla velit porttitor et. Nam tincidunt gravida dui, sed pharetra odio pharetra nec. Duis consectetur venenatis pharetra. Vestibulum egestas nisi quis elementum elementum.</span>
+											</a>
+										</li>
+										<li>
+											<a href="#" class="clearfix">
+												<figure class="image">
+													<img src="img/!sample-user.jpg" alt="Joe Junior" class="rounded-circle" />
+												</figure>
+												<span class="title">Joe Junior</span>
+												<span class="message">Lorem ipsum dolor sit.</span>
+											</a>
+										</li>
+										<li>
+											<a href="#" class="clearfix">
+												<figure class="image">
+													<img src="img/!sample-user.jpg" alt="Joseph Junior" class="rounded-circle" />
+												</figure>
+												<span class="title">Joseph Junior</span>
+												<span class="message">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet lacinia orci. Proin vestibulum eget risus non luctus. Nunc cursus lacinia lacinia. Nulla molestie malesuada est ac tincidunt. Quisque eget convallis diam.</span>
+											</a>
+										</li>
+									</ul>
+
+									<hr />
+
+									<div class="text-end">
+										<a href="#" class="view-more">View All</a>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<a href="#" class="dropdown-toggle notification-icon" data-bs-toggle="dropdown">
+								<i class="bx bx-bell"></i>
+								<span class="badge">3</span>
+							</a>
+
+							<div class="dropdown-menu notification-menu">
+								<div class="notification-title">
+									<span class="float-end badge badge-default">3</span>
+									Alerts
+								</div>
+
+								<div class="content">
+									<ul>
+										<li>
+											<a href="#" class="clearfix">
+												<div class="image">
+													<i class="fas fa-thumbs-down bg-danger text-light"></i>
+												</div>
+												<span class="title">Server is Down!</span>
+												<span class="message">Just now</span>
+											</a>
+										</li>
+										<li>
+											<a href="#" class="clearfix">
+												<div class="image">
+													<i class="bx bx-lock bg-warning text-light"></i>
+												</div>
+												<span class="title">User Locked</span>
+												<span class="message">15 minutes ago</span>
+											</a>
+										</li>
+										<li>
+											<a href="#" class="clearfix">
+												<div class="image">
+													<i class="fas fa-signal bg-success text-light"></i>
+												</div>
+												<span class="title">Connection Restaured</span>
+												<span class="message">10/10/2023</span>
+											</a>
+										</li>
+									</ul>
+
+									<hr />
+
+									<div class="text-end">
+										<a href="#" class="view-more">View All</a>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+
+					<span class="separator"></span>
+                    {% if app.user.super == 0 %}
+					<div id="userbox" class="userbox">
+						<a href="#" data-bs-toggle="dropdown">
+							<figure class="profile-picture">
+								<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" />
+							</figure>
+							<div class="profile-info" data-lock-name="{{ app.user.nombre }}" data-lock-email="{{ app.user.email}}">
+								<span class="name">{{ app.user.nombre }}{{ app.user.apellidos}}</span>
+								<span class="role">
+									SUPER
+								</span>
+							</div>
+							{% elseif app.user.super == 1 %}
+                        <div id="userbox" class="userbox">
+						    <a href="#" data-bs-toggle="dropdown">
+							<figure class="profile-picture">
+								<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" />
+							</figure>
+							<div class="profile-info" data-lock-name="{{ app.user.nombre }}" data-lock-email="{{ app.user.email}}">
+								<span class="name">{{ app.user.nombre }}{{ app.user.apellidos}}</span>
+								<span class="role">
+									ADMIN
+								</span>
+							</div>
+							{% elseif app.user.super == 2 %}
+                        <div id="userbox" class="userbox">
+						    <a href="#" data-bs-toggle="dropdown">
+							<figure class="profile-picture">
+								<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" />
+							</figure>
+							<div class="profile-info" data-lock-name="{{ app.user.nombre }}" data-lock-email="{{ app.user.email}}">
+								<span class="name">{{ app.user.nombre }}{{ app.user.apellidos}}</span>
+								<span class="role">
+									USUARIO
+								</span>
+							</div>
+							{% else %}
+							PERFIL DESCONOCIDO
+							{% endif %}
+
+							<i class="fa custom-caret"></i>
+						    </a>
+
+						<div class="dropdown-menu">
+							<ul class="list-unstyled mb-2">
+								<li class="divider"></li>
+								{% if app.user.super == 0 %}
+								<li>
+									<a role="menuitem" tabindex="-1" href="{{ path('app_profile')}}"><i class="bx bx-user-circle"></i> Mi Perfil</a>
+								</li>
+								<li>
+									<a role="menuitem" tabindex="-1" href="{{ path('app_logout') }}"><i class="bx bx-power-off"></i> Logout</a>
+								</li>
+								{% elseif app.user.super == 1 %}
+								<li>
+									<a role="menuitem" tabindex="-1" href="{{ path('app_profile')}}"><i class="bx bx-user-circle"></i> Mi Perfil</a>
+								</li>
+								<li>
+									<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="bx bx-user-circle"></i> Mi Empresa</a>
+								</li>
+								<li>
+									<a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i class="bx bx-lock"></i> Lock Screen</a>
+								</li>
+								<li>
+									<a role="menuitem" tabindex="-1" href="{{ path('app_logout') }}"><i class="bx bx-power-off"></i> Logout</a>
+								</li>
+								{% elseif app.user.super == 2 %}
+								<li>
+									<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="bx bx-user-circle"></i> Mi Perfil</a>
+								</li>
+								<li>
+									<a role="menuitem" tabindex="-1" href="{{ path('app_logout') }}"><i class="bx bx-power-off"></i> Logout</a>
+								</li>
+								{% endif %}
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!-- end: search & user box -->
+			</header>
+			<!-- end: header -->
+
+			<div class="inner-wrapper">
+				<!-- start: sidebar -->
+				<aside id="sidebar-left" class="sidebar-left">
+
+				    <div class="sidebar-header">
+				        <div class="sidebar-title">
+				            Navigation
+				        </div>
+				        <div class="sidebar-toggle d-none d-md-block" data-toggle-class="sidebar-left-collapsed" data-target="html" data-fire-event="sidebar-left-toggle">
+				            <i class="fas fa-bars" aria-label="Toggle sidebar"></i>
+				        </div>
+				    </div>
+
+				    <div class="nano">
+				        <div class="nano-content">
+				            <nav id="menu" class="nav-main" role="navigation">
+
+				                <ul class="nav nav-main">
+				                    <li>
+				                        <a class="nav-link" href="/">
+				                            <i class="fa-solid fa-house" aria-hidden="true"></i>
+				                            <span>Inicio</span>
+				                        </a>                        
+				                    </li>
+									{% if app.user.super == 0 %}
+				                    <li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-building-columns" aria-hidden="true" ></i>
+				                            <span>Empresas</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'cliente' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_cliente') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-users" aria-hidden="true"></i>
+				                            <span>Usuarios</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'User' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_user') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-face-smile" aria-hidden="true"></i>
+				                            <span>Estados</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Estado' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_estado') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-book" aria-hidden="true"></i>
+				                            <span>Tareas</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Tarea' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_tarea') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-cart-shopping" aria-hidden="true" ></i>
+				                            <span>Productos</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Producto' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_producto') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-circle-info" aria-hidden="true" ></i>
+				                            <span>Detalles</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Detalle' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_detalle') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-paperclip" aria-hidden="true" ></i>
+				                            <span>Presupuestos</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Presupuesto' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_presupuesto') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									{% elseif app.user.super == 1 %}
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-users" aria-hidden="true"></i>
+				                            <span>Usuarios</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'User' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_user') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-face-smile" aria-hidden="true"></i>
+				                            <span>Estados</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Estado' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_estado') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-book" aria-hidden="true"></i>
+				                            <span>Tareas</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Tarea' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_tarea') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+				                            <span>Mail</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_mail_auth_configure')}}">
+				                                    correo 
+				                                </a>
+				                            </li>
+				                        </ul>
+				                    </li>
+									{% elseif app.user.super == 2 %}
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-face-smile" aria-hidden="true"></i>
+				                            <span>Estados</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Estado' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_estado') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									<li class="nav-parent">
+				                        <a class="nav-link" href="#">
+				                            <i class="fa-solid fa-book" aria-hidden="true"></i>
+				                            <span>Tareas</span>
+				                        </a>
+				                        <ul class="nav nav-children">
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_list', { 'entity': 'Tarea' }) }}">
+				                                    Lista 
+				                                </a>
+				                            </li>
+				                            <li>
+				                                <a class="nav-link" href="{{ path('app_add_tarea') }}">
+				                                    Crear
+				                                </a>
+				                            </li>
+				                            
+				                        </ul>
+				                    </li>
+									{% endif %}
+
+				        <script>
+				            // Maintain Scroll Position
+				            if (typeof localStorage !== 'undefined') {
+				                if (localStorage.getItem('sidebar-left-position') !== null) {
+				                    var initialPosition = localStorage.getItem('sidebar-left-position'),
+				                        sidebarLeft = document.querySelector('#sidebar-left .nano-content');
+
+				                    sidebarLeft.scrollTop = initialPosition;
+				                }
+				            }
+				        </script>
+
+				    </div>
+                    {% if app.user.super == 1 and app.user.cliente.checking == true %}
+						<div class="custom-alert" role="alert">
+							{% set ahora = "now"|date("Y-m-d H:i:s")|date %}
+							{% set diferencia = app.user.cliente.testat|date("Y-m-d H:i:s")|date('U') - ahora|date('U') %}
+
+							{% set dias = (diferencia // 86400) %}
+							{% set horas = ((diferencia % 86400) // 3600) %}
+
+							{% if diferencia > 0 %}
+								El periodo de prueba finaliza en {{ dias }} dia{% if dias != 1 %}s{% endif %} {{ horas}}h
+							{% else %}
+								El periodo de prueba ha finalizado
+							{% endif %}
+						</div>	
+					{% endif %}
+
+				</aside>
+				<!-- end: sidebar -->
+
+				<section role="main" class="content-body">
+					<header class="page-header">
+						<h2>User Profile</h2>
+
+						<div class="right-wrapper text-end">
+							<ol class="breadcrumbs">
+								<li>
+									<a href="index.html">
+										<i class="bx bx-home-alt"></i>
+									</a>
+								</li>
+
+								<li><span>Pages</span></li>
+
+								<li><span>User Profile</span></li>
+
+							</ol>
+
+							<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>
+						</div>
+					</header>
+
+					<!-- start: page -->
+                    {# inicio perfil #}
+                    {% if app.user.super == 0 %}
+					<div class="row">
+						<div class="col-lg-4 col-xl-3 mb-4 mb-xl-0">
+
+							<section class="card">
+								<div class="card-body">
+									<div class="thumb-info mb-3">
+										<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" style="max-width: 350px; height: auto; border-radius: 50%;">
+										<div class="thumb-info-title">
+											<span class="thumb-info-inner">{{ app.user.nombre }}{{ app.user.apellidos }}</span>
+											<span class="thumb-info-type">SUPER</span>
+										</div>
+									</div>
+
+									<div class="widget-toggle-expand mb-3">
+										<div class="widget-header">
+											<h5 class="mb-2 font-weight-semibold text-dark">Profile Completion</h5>
+											<div class="widget-toggle">+</div>
+										</div>
+										<div class="widget-content-collapsed">
+											<div class="progress progress-xs light">
+												<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+													60%
+												</div>
+											</div>
+										</div>
+										<div class="widget-content-expanded">
+											<ul class="simple-todo-list mt-3">
+												<li class="completed">Update Profile Picture</li>
+												<li class="completed">Change Personal Information</li>
+												<li>Update Social Media</li>
+												<li>Follow Someone</li>
+											</ul>
+										</div>
+									</div>
+
+									<hr class="dotted short">
+
+									<h5 class="mb-2 mt-3">About</h5>
+									<p class="text-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis vulputate quam. Interdum et malesuada</p>
+									<div class="clearfix">
+										<a class="text-uppercase text-muted float-end" href="#">(View All)</a>
+									</div>
+
+									<hr class="dotted short">
+
+									<div class="social-icons-list">
+										<a rel="tooltip" data-bs-placement="bottom" target="_blank" href="http://www.facebook.com" data-original-title="Facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.twitter.com" data-original-title="Twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.linkedin.com" data-original-title="Linkedin"><i class="fab fa-linkedin-in"></i><span>Linkedin</span></a>
+									</div>
+
+								</div>
+							</section>
+                            {# fin perfil #}
+
+                            {# inicio perfil #}
+                    {% elseif app.user.super == 1 %}
+					<div class="row">
+						<div class="col-lg-4 col-xl-3 mb-4 mb-xl-0">
+
+							<section class="card">
+								<div class="card-body">
+									<div class="thumb-info mb-3">
+										<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" style="max-width: 350px; height: auto; border-radius: 50%;">
+										<div class="thumb-info-title">
+											<span class="thumb-info-inner">{{ app.user.nombre }}{{ app.user.apellidos }}</span>
+											<span class="thumb-info-type">ADMIN</span>
+										</div>
+									</div>
+
+									<div class="widget-toggle-expand mb-3">
+										<div class="widget-header">
+											<h5 class="mb-2 font-weight-semibold text-dark">Profile Completion</h5>
+											<div class="widget-toggle">+</div>
+										</div>
+										<div class="widget-content-collapsed">
+											<div class="progress progress-xs light">
+												<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+													60%
+												</div>
+											</div>
+										</div>
+										<div class="widget-content-expanded">
+											<ul class="simple-todo-list mt-3">
+												<li class="completed">Update Profile Picture</li>
+												<li class="completed">Change Personal Information</li>
+												<li>Update Social Media</li>
+												<li>Follow Someone</li>
+											</ul>
+										</div>
+									</div>
+
+									<hr class="dotted short">
+
+									<h5 class="mb-2 mt-3">About</h5>
+									<p class="text-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis vulputate quam. Interdum et malesuada</p>
+									<div class="clearfix">
+										<a class="text-uppercase text-muted float-end" href="#">(View All)</a>
+									</div>
+
+									<hr class="dotted short">
+
+									<div class="social-icons-list">
+										<a rel="tooltip" data-bs-placement="bottom" target="_blank" href="http://www.facebook.com" data-original-title="Facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.twitter.com" data-original-title="Twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.linkedin.com" data-original-title="Linkedin"><i class="fab fa-linkedin-in"></i><span>Linkedin</span></a>
+									</div>
+
+								</div>
+							</section>
+                            {# fin perfil #}
+                            {# inicio perfil #}
+                    {% elseif app.user.super == 2 %}
+					<div class="row">
+						<div class="col-lg-4 col-xl-3 mb-4 mb-xl-0">
+
+							<section class="card">
+								<div class="card-body">
+									<div class="thumb-info mb-3">
+										<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil" style="max-width: 350px; height: auto; border-radius: 50%;">
+										<div class="thumb-info-title">
+											<span class="thumb-info-inner">{{ app.user.nombre }}{{ app.user.apellidos }}</span>
+											<span class="thumb-info-type">USUARIO</span>
+										</div>
+									</div>
+
+									<div class="widget-toggle-expand mb-3">
+										<div class="widget-header">
+											<h5 class="mb-2 font-weight-semibold text-dark">Profile Completion</h5>
+											<div class="widget-toggle">+</div>
+										</div>
+										<div class="widget-content-collapsed">
+											<div class="progress progress-xs light">
+												<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+													60%
+												</div>
+											</div>
+										</div>
+										<div class="widget-content-expanded">
+											<ul class="simple-todo-list mt-3">
+												<li class="completed">Update Profile Picture</li>
+												<li class="completed">Change Personal Information</li>
+												<li>Update Social Media</li>
+												<li>Follow Someone</li>
+											</ul>
+										</div>
+									</div>
+
+									<hr class="dotted short">
+
+									<h5 class="mb-2 mt-3">About</h5>
+									<p class="text-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis vulputate quam. Interdum et malesuada</p>
+									<div class="clearfix">
+										<a class="text-uppercase text-muted float-end" href="#">(View All)</a>
+									</div>
+
+									<hr class="dotted short">
+
+									<div class="social-icons-list">
+										<a rel="tooltip" data-bs-placement="bottom" target="_blank" href="http://www.facebook.com" data-original-title="Facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.twitter.com" data-original-title="Twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
+										<a rel="tooltip" data-bs-placement="bottom" href="http://www.linkedin.com" data-original-title="Linkedin"><i class="fab fa-linkedin-in"></i><span>Linkedin</span></a>
+									</div>
+								</div>
+							</section>
+                            {# fin perfil #}
+                            {% endif %}
+
+						</div>
+						<div class="col-lg-8 col-xl-6">
+
+							<div class="tabs">
+								<ul class="nav nav-tabs tabs-primary">
+									<li class="nav-item active">
+										<button class="nav-link" data-bs-target="#overview" data-bs-toggle="tab">X</button>
+									</li>
+									<li class="nav-item">
+										<button class="nav-link" data-bs-target="#edit" data-bs-toggle="tab">Informacion Personal</button>
+									</li>
+								</ul>
+								<div class="tab-content">
+									<div id="overview" class="tab-pane active">
+
+										<div class="p-3">
+
+											<h4 class="mb-3 font-weight-semibold text-dark">Update Status</h4>
+
+											<section class="simple-compose-box mb-3">
+												<form method="get" action="/">
+													<textarea name="message-text" data-plugin-textarea-autosize placeholder="What's on your mind?" rows="1"></textarea>
+												</form>
+												<div class="compose-box-footer">
+													<ul class="compose-toolbar">
+														<li>
+															<a href="#"><i class="fas fa-camera"></i></a>
+														</li>
+														<li>
+															<a href="#"><i class="fas fa-map-marker-alt"></i></a>
+														</li>
+													</ul>
+													<ul class="compose-btn">
+														<li>
+															<a href="#" class="btn btn-primary btn-xs">Post</a>
+														</li>
+													</ul>
+												</div>
+											</section>
+
+											<h4 class="mb-3 pt-4 font-weight-semibold text-dark">Timeline</h4>
+
+											<div class="timeline timeline-simple mt-3 mb-3">
+												<div class="tm-body">
+													<div class="tm-title">
+														<h5 class="m-0 pt-2 pb-2 text-dark font-weight-semibold text-uppercase">November 2023</h5>
+													</div>
+													<ol class="tm-items">
+														<li>
+															<div class="tm-box">
+																<p class="text-muted mb-0">7 months ago.</p>
+																<p>
+																	It's awesome when we find a good solution for our projects, Porto Admin is <span class="text-primary">#awesome</span>
+																</p>
+															</div>
+														</li>
+														<li>
+															<div class="tm-box">
+																<p class="text-muted mb-0">7 months ago.</p>
+																<p>
+																	What is your biggest developer pain point?
+																</p>
+															</div>
+														</li>
+														<li>
+															<div class="tm-box">
+																<p class="text-muted mb-0">7 months ago.</p>
+																<p>
+																	Checkout! How cool is that!
+																</p>
+																<div class="thumbnail-gallery">
+																	<a class="img-thumbnail lightbox" href="img/projects/project-4.jpg" data-plugin-options='{ "type":"image" }'>
+																		<img class="img-fluid" width="215" src="img/projects/project-4.jpg">
+																		<span class="zoom">
+																			<i class="bx bx-search"></i>
+																		</span>
+																	</a>
+																</div>
+															</div>
+														</li>
+													</ol>
+												</div>
+											</div>
+										</div>
+
+									</div>
+									<div id="edit" class="tab-pane">
+
+										<form class="p-3">
+											<h4 class="mb-3 font-weight-semibold text-dark">Informacion Personal</h4>
+											<div class="row row mb-4">
+												<div class="form-group col">
+													<label for="inputAddress">Nombre</label>
+													<input type="text" class="form-control" id="inputAddress" placeholder="{{ app.user.nombre }}">
+												</div>
+											</div>
+											<div class="row mb-4">
+												<div class="form-group col">
+													<label for="inputAddress2">Apellidos</label>
+													<input type="text" class="form-control" id="inputAddress2" placeholder="{{ app.user.apellidos }}">
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group col-md-6">
+													<label for="inputCity">Ciudad</label>
+													<input type="text" class="form-control" id="inputCity" placeholder="{{ app.user.cliente.localidad }}">
+												</div>
+												<div class="form-group col-md-4 border-top-0 pt-0">
+													<label for="inputState">Provincia</label>
+													<input type="text" class="form-control" id="inputState" placeholder="{{ app.user.cliente.provincia }}">
+												</div>
+												<div class="form-group col-md-2 border-top-0 pt-0">
+													<label for="inputZip">Cd.Postal</label>
+													<input type="text" class="form-control" id="inputZip" placeholder="{{ app.user.cliente.codigopostal }}">
+												</div>
+												<div class="form-group col-md-2 border-top-0 pt-0">
+													<label for="inputImage">Imagen</label>
+													<input type="file" class="form-control" id="inputImage" name="imagen" accept="image/*">
+												</div>
+											</div>
+
+											<hr class="dotted tall">
+
+											<h4 class="mb-3 font-weight-semibold text-dark">Change Password</h4>
+											<div class="row">
+												<div class="form-group col-md-6">
+													<label for="inputPassword4">New Password</label>
+													<input type="password" class="form-control" id="inputPassword4" placeholder="Password">
+												</div>
+												<div class="form-group col-md-6 border-top-0 pt-0">
+													<label for="inputPassword5">Re New Password</label>
+													<input type="password" class="form-control" id="inputPassword5" placeholder="Password">
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-12 text-end mt-3">
+													<button class="btn btn-primary modal-confirm">Save</button>
+												</div>
+												<form action="{{ path('app_pago') }}" method="get">
+													<button type="submit" class="btn btn-primary">Pagar con Redsys</button>
+												</form>
+											</div>
+
+										</form>
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-3">
+
+							<section class="card">
+								<header class="card-header">
+									<div class="card-actions">
+										<a href="#" class="card-action card-action-toggle" data-card-toggle></a>
+										<a href="#" class="card-action card-action-dismiss" data-card-dismiss></a>
+									</div>
+
+									<h2 class="card-title">
+										<span class="badge badge-primary label-sm font-weight-normal va-middle me-3">298</span>
+										<span class="va-middle">Compañeros</span>
+									</h2>
+								</header>
+								<div class="card-body">
+									<div class="content">
+										<ul class="simple-user-list">
+										{% for companero in companeros %}
+											<li>
+												<figure class="image rounded">
+													<img src="{{ user.imagen ? asset('img/profile/' ~ user.imagen) : asset('img/profile/gestor.png') }}" alt="Foto de perfil"  class="rounded-circle" style="max-width: 40px; height: auto; border-radius: 50%;">
+												</figure>
+												<span class="title">{{ companero.nombre }}</span>
+												<span class="message truncate">Lorem ipsum dolor sit.</span>
+											</li>
+											<li>
+											{% else %}
+												<li>No hay companeros en la misma empresa.</li>
+											{% endfor %}
+										</ul>
+										<hr class="dotted short">
+										<div class="text-end">
+											<a class="text-uppercase text-muted" href="#">(View All)</a>
+										</div>
+									</div>
+								</div>
+								<div class="card-footer">
+									<div class="input-group">
+										<input type="text" class="form-control" name="s" id="s" placeholder="Search...">
+										<button class="btn btn-default" type="submit"><i class="bx bx-search"></i></button>
+									</div>
+								</div>
+							</section>
+						</div>
+
+					</div>
+					<!-- end: page -->
+				</section>
+			</div>
+
+			<aside id="sidebar-right" class="sidebar-right">
+				<div class="nano">
+					<div class="nano-content">
+						<a href="#" class="mobile-close d-md-none">
+							Collapse <i class="fas fa-chevron-right"></i>
+						</a>
+
+						<div class="sidebar-right-wrapper">
+
+							<div class="sidebar-widget widget-calendar">
+								<h6>Upcoming Tasks</h6>
+								<div data-plugin-datepicker data-plugin-skin="dark"></div>
+
+								<ul>
+									<li>
+										<time datetime="2023-04-19T00:00+00:00">04/19/2023</time>
+										<span>Company Meeting</span>
+									</li>
+								</ul>
+							</div>
+
+							<div class="sidebar-widget widget-friends">
+								<h6>Friends</h6>
+								<ul>
+									<li class="status-online">
+										<figure class="profile-picture">
+											<img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+										</figure>
+										<div class="profile-info">
+											<span class="name">Joseph Doe Junior</span>
+											<span class="title">Hey, how are you?</span>
+										</div>
+									</li>
+									<li class="status-online">
+										<figure class="profile-picture">
+											<img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+										</figure>
+										<div class="profile-info">
+											<span class="name">Joseph Doe Junior</span>
+											<span class="title">Hey, how are you?</span>
+										</div>
+									</li>
+									<li class="status-offline">
+										<figure class="profile-picture">
+											<img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+										</figure>
+										<div class="profile-info">
+											<span class="name">Joseph Doe Junior</span>
+											<span class="title">Hey, how are you?</span>
+										</div>
+									</li>
+									<li class="status-offline">
+										<figure class="profile-picture">
+											<img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+										</figure>
+										<div class="profile-info">
+											<span class="name">Joseph Doe Junior</span>
+											<span class="title">Hey, how are you?</span>
+										</div>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</aside>
+		</section>
+
+		<!-- Vendor -->
+		<script src="/assets/vendor/jquery/jquery.js"></script>
+		<script src="/assets/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+		<script src="/assets/vendor/popper/umd/popper.min.js"></script>
+		<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+		<script src="/assets/vendor/common/common.js"></script>
+		<script src="/assets/vendor/nanoscroller/nanoscroller.js"></script>
+		<script src="/assets/vendor/magnific-popup/jquery.magnific-popup.js"></script>
+		<script src="/assets/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+
+		<!-- Specific Page Vendor -->
+		<script src="/assets/vendor/autosize/autosize.js"></script>
+
+		<!-- Theme Base, Components and Settings -->
+		<script src="/assets/js/theme.js"></script>
+
+		<!-- Theme Custom -->
+		<script src="/assets/js/custom.js"></script>
+
+		<!-- Theme Initialization Files -->
+		<script src="/assets/js/theme.init.js"></script>
+
+	</body>
+</html>

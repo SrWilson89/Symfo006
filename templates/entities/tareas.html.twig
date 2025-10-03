@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+
+{% block content %}
+	{% include 'partials/alerts.html.twig' %}
+		<div class="row">
+			<div class="col">
+				<section class="card">
+						<div class="card-body">
+								{{ form_start(form)}}
+							<div class="form-group row pb-4">
+								<label class="col-lg-3 control-label text-lg-end pt-2">ID:</label>
+								<div class="col-lg-6">
+									{{ object.id }}
+								</div>
+							</div>
+                            {#<div class="form-group row pb-4">
+                                <label class="col-lg-3 control-label text-lg-end pt-2">Usuario:</label>
+								<div class="col-lg-2">
+									{{form_widget(form.usuario)}}
+								</div>
+							</div>#}
+                            <div class="form-group row pb-4">
+								<label class="col-lg-3 control-label text-lg-end pt-2">Estado:</label>
+								<div class="col-lg-2">
+									{{form_widget(form.estado)}}
+								</div>
+							</div>
+                            <div class="form-group row pb-4">
+								<label class="col-lg-3 control-label text-lg-end pt-2">Titulo:</label>
+								<div class="col-lg-6">
+									{{form_widget(form.titulo)}}
+								</div>
+							</div>
+                            <div class="form-group row pb-4">
+								<label class="col-lg-3 control-label text-lg-end pt-2">Notas:</label>
+								<div class="col-lg-6">
+									{{form_widget(form.notas)}}
+								</div>
+							</div>
+							<div class="form-group row pb-4">
+								<label class="col-lg-3 control-label text-lg-end pt-2">Fecha_Creacion:</label>
+								<div class="col-lg-2">
+									{{form_widget(form.FechaCreacion)}}
+								</div>
+                                <label class="col-lg-3 control-label text-lg-end pt-2">Modificacion:</label>
+								<div class="col-lg-2">
+									{{form_widget(form.Modificacion)}}
+								</div>
+							</div>
+							<div class="form-group row pb-4">
+								<div class="col-lg-9">
+									{{form_widget(form.save)}}
+								</div>
+							</div>
+								{{form_widget(form)}}
+							{{form_end(form)}}
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<section class="card">
+									<header class="card-header">
+										<div class="card-actions">
+											<a href="#" class="card-action card-action-toggle" data-card-toggle></a>
+											<a href="#" class="card-action card-action-dismiss" data-card-dismiss></a>
+										</div>
+
+										<h2 class="card-title">Historico</h2>
+									</header>
+									<div class="card-body">
+										<table class="table table-responsive-md mb-0">
+											<thead>
+												<tr>
+													<th>ID</th>
+													<th>Tarea</th>
+													<th>Usuario</th>
+													<th>Acciones</th>  {# Nueva columna para botones #}
+												</tr>
+											</thead>
+											<tbody>
+											{% if object.hilos is not empty %}
+												{% for hilo in object.hilos %}
+													<tr>
+														<td>{{ hilo.id }}</td>
+														<td>{{ hilo.tarea.titulo }}</td>
+														<td>{{ hilo.usuario.nombre }}</td>
+														<td>
+															<a class="btn btn-primary" href="{{ path('app_edit_hilo', {'id': hilo.id}) }}">Editar</a>
+														</td>
+													</tr>
+												{% endfor %}
+											{% else %}
+												<tr>
+													<td colspan="4">No hay tareas para mostrar</td>
+												</tr>
+											{% endif %}
+											</tbody>
+										</table>
+									</div>
+								</section>
+							</div>
+						</div>
+				</section>
+			</div>
+		</div>			
+{% endblock %}
+
+{% block vendor %}
+
+		
+{% endblock %}

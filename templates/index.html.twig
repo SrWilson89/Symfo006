@@ -1,0 +1,643 @@
+{% extends 'base.html.twig' %}
+
+{% block head %}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+	{% if app.user.super == 0 %}
+	{# Principio tarjetas #}
+					<div class="row">
+						<!-- Gráfico a la izquierda -->
+						<div class="col-lg-8">
+							<div class="card h-100">
+								<div class="card-body" style="height: 400px;">
+									<canvas id="lineChart" style="width: 100%; height: 100%;"></canvas>
+								</div>
+							</div>
+						</div>
+
+						<!-- Tarjetas a la derecha -->
+						<div class="col-lg-4">
+							<div class="row">
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-primary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-primary">
+														<i class="fas fa-life-ring"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Atencion al cliente</h4>
+														<div class="info">
+															<strong class="amount">0</strong>
+															<span class="text-primary">(14 unread)</span>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(view all)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-secondary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-secondary">
+														<i class="fas fa-dollar-sign"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Tareas abiertas</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.countopentasks }}</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(withdraw)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-tertiary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-tertiary">
+														<i class="fas fa-shopping-cart"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Ventas</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.sales }}</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(statement)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12">
+									<section class="card card-featured-left card-featured-quaternary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-quaternary">
+														<i class="fas fa-user"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Usuarios Online</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.onlinePercentage }}%</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(report)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+							</div>
+						</div>
+					</div>
+				{# fin tarjetas #}
+				{# principio grafico #}
+					<script>
+						const ctx = document.getElementById('lineChart').getContext('2d');
+						const lineChart = new Chart(ctx, {
+							type: 'line',
+							data: {
+								labels: {{ resume.grafico.labels|json_encode|raw }},
+								datasets: [
+									{
+										label: 'Clientes Registrados',
+										data: {{ resume.grafico.newCustomers|json_encode|raw }},
+										borderColor: 'rgba(75, 192, 192, 1)',
+										backgroundColor: 'rgba(75, 192, 192, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Nuevos Usuarios',
+										data: {{ resume.grafico.newUsers|json_encode|raw }},
+										borderColor: 'rgba(54, 162, 235, 1)',
+										backgroundColor: 'rgba(54, 162, 235, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Ventas',
+										data: {{ resume.grafico.sales|json_encode|raw }},
+										borderColor: 'rgba(255, 99, 132, 1)',
+										backgroundColor: 'rgba(255, 99, 132, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Tareas Creadas',
+										data: {{ resume.grafico.newTasks|json_encode|raw }},
+										borderColor: 'rgba(255, 206, 86, 1)',
+										backgroundColor: 'rgba(255, 206, 86, 0.2)',
+										fill: false,
+										tension: 0.1
+									}
+								]
+							},
+							options: {
+								responsive: true,
+								maintainAspectRatio: false,
+								interaction: {
+									mode: 'index',
+									intersect: false,
+								},
+								stacked: false,
+								plugins: {
+									title: {
+										display: true,
+										text: 'Datos del Último Año por Mes'
+									}
+								},
+								scales: {
+									y: {
+										beginAtZero: true,
+									}
+								}
+							}
+						});
+					</script>
+						{# principio list.tareas abiertas #}
+					<div class="row">
+						<!-- Columna izquierda: Tabla de tareas -->
+						<div class="col-lg-8">
+							<section class="card">
+								<header class="card-header">
+									<h2 class="card-title">Tareas Abiertas</h2>
+								</header>
+									<div class="card-body">
+										<div style="max-height: 300px; overflow-y: auto;">
+											<table class="table mb-0">
+												<thead>
+													<tr>
+													<th>ID</th>
+													<th>Estado</th>
+													<th>Título</th>
+													<th>Usuario</th>
+													<th>Acciones</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% set openTasksExist = false %}
+													{% for tarea in opentasks %}
+													{% if tarea.fechafin is null %}
+														{% set openTasksExist = true %}
+														<tr>
+														<td>{{ tarea.id }}</td>
+														<td>
+														{% if tarea.estado == 'activo' %}
+															<span class="badge bg-success">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'pendiente' %}
+															<span class="badge bg-warning text-dark">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'inactivo' %}
+															<span class="badge bg-primary">{{ tarea.estado }}</span>
+														{% else %}
+															{# Si es finalizado u otro estado, no mostramos nada #}
+														{% endif %}
+														</td>
+														<td>{{ tarea.titulo }}</td>
+														<td>{{ tarea.usuario.nombre }}</td>
+														<td>
+															<a class="btn btn-primary" href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">Editar</a>
+														</td>
+														</tr>
+													{% endif %}
+													{% endfor %}
+													{% if not openTasksExist %}
+													<tr><td colspan="5">No hay tareas abiertas</td></tr>
+													{% endif %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</section>
+							</div>
+						{# final list.tareas abiertas #}
+
+						<!-- Columna derecha: Hilo de tareas -->
+						<div class="col-lg-4">
+							<section class="card">
+								<header class="card-header">
+									<h2 class="card-title">Hilo Tareas</h2>
+								</header>
+								<div class="card-body">
+									<div class="timeline timeline-simple mt-3 mb-3">
+										<div class="tm-body" style="max-height: 300px; overflow-y: auto;">
+											{% if hilos is not empty %}
+												<ol class="tm-items">
+													{% for hilo in hilos %}
+														<li>
+															<div class="tm-box">
+																<p class="text-muted mb-0">
+																	{{ hilo.usuario.nombre }} - {{ hilo.fechaCreacion ? hilo.fechaCreacion|date('d/m/Y H:i') : '' }}
+																</p>
+																<p>{{ hilo.tarea.titulo }}</p>
+																<p>{{ hilo.notas }}</p>
+															</div>
+														</li>
+													{% endfor %}
+												</ol>
+											{% else %}
+												<p>No hay mensajes en el hilo para estas tareas.</p>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						
+					{# final Hilo.tareas abiertas #}
+					{% elseif app.user.super == 1 %}
+					<!-- start: page -->
+					{# Principio tarjetas #}
+					<div class="row">
+						<!-- Gráfico a la izquierda -->
+						<div class="col-lg-8">
+							<div class="card h-100">
+								<div class="card-body" style="height: 400px;">
+									<canvas id="lineChart" style="width: 100%; height: 100%;"></canvas>
+								</div>
+							</div>
+						</div>
+
+						<!-- Tarjetas a la derecha -->
+						<div class="col-lg-4">
+							<div class="row">
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-primary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-primary">
+														<i class="fas fa-life-ring"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Atencion al cliente</h4>
+														<div class="info">
+															<strong class="amount">0</strong>
+															<span class="text-primary">(14 unread)</span>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(view all)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-secondary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-secondary">
+														<i class="fas fa-dollar-sign"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Tareas Abiertas</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.countopentasks }}</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(withdraw)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12 mb-3">
+									<section class="card card-featured-left card-featured-tertiary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-tertiary">
+														<i class="fas fa-shopping-cart"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Nuevos Clientes</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.newCustomers }}</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(statement)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+
+								<div class="col-sm-12">
+									<section class="card card-featured-left card-featured-quaternary">
+										<div class="card-body">
+											<div class="widget-summary">
+												<div class="widget-summary-col widget-summary-col-icon">
+													<div class="summary-icon bg-quaternary">
+														<i class="fas fa-user"></i>
+													</div>
+												</div>
+												<div class="widget-summary-col">
+													<div class="summary">
+														<h4 class="title">Usuarios Online</h4>
+														<div class="info">
+															<strong class="amount">{{ resume.onlinePercentage }}%</strong>
+														</div>
+													</div>
+													<div class="summary-footer">
+														<a class="text-muted text-uppercase" href="#">(report)</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+							</div>
+						</div>
+					</div>
+				{# fin tarjetas #}
+				{# principio grafico #}
+					<script>
+						const ctx = document.getElementById('lineChart').getContext('2d');
+						const lineChart = new Chart(ctx, {
+							type: 'line',
+							data: {
+								labels: {{ resume.grafico.labels|json_encode|raw }},
+								datasets: [
+									{
+										label: 'Clientes Registrados',
+										data: {{ resume.grafico.newCustomers|json_encode|raw }},
+										borderColor: 'rgba(75, 192, 192, 1)',
+										backgroundColor: 'rgba(75, 192, 192, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Nuevos Usuarios',
+										data: {{ resume.grafico.newUsers|json_encode|raw }},
+										borderColor: 'rgba(54, 162, 235, 1)',
+										backgroundColor: 'rgba(54, 162, 235, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Ventas',
+										data: {{ resume.grafico.sales|json_encode|raw }},
+										borderColor: 'rgba(255, 99, 132, 1)',
+										backgroundColor: 'rgba(255, 99, 132, 0.2)',
+										fill: false,
+										tension: 0.1
+									},
+									{
+										label: 'Tareas Creadas',
+										data: {{ resume.grafico.newTasks|json_encode|raw }},
+										borderColor: 'rgba(255, 206, 86, 1)',
+										backgroundColor: 'rgba(255, 206, 86, 0.2)',
+										fill: false,
+										tension: 0.1
+									}
+								]
+							},
+							options: {
+								responsive: true,
+								maintainAspectRatio: false,
+								interaction: {
+									mode: 'index',
+									intersect: false,
+								},
+								stacked: false,
+								plugins: {
+									title: {
+										display: true,
+										text: 'Datos del Último Año por Mes'
+									}
+								},
+								scales: {
+									y: {
+										beginAtZero: true,
+									}
+								}
+							}
+						});
+					</script>
+					{# final grafico #}
+					{# principio list.tareas abiertas #}
+					<div class="row">
+						<!-- Columna izquierda: Tabla de tareas -->
+						<div class="col-lg-8">
+							<section class="card">
+								<header class="card-header">
+									<h2 class="card-title">Tareas Abiertas</h2>
+								</header>
+									<div class="card-body">
+										<div style="max-height: 300px; overflow-y: auto;">
+											<table class="table mb-0">
+												<thead>
+													<tr>
+													<th>ID</th>
+													<th>Estado</th>
+													<th>Título</th>
+													<th>Usuario</th>
+													<th>Acciones</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% set openTasksExist = false %}
+													{% for tarea in opentasks %}
+													{% if tarea.fechafin is null %}
+														{% set openTasksExist = true %}
+														<tr>
+														<td>{{ tarea.id }}</td>
+														<td>
+														{% if tarea.estado == 'activo' %}
+															<span class="badge bg-success">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'pendiente' %}
+															<span class="badge bg-warning text-dark">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'inactivo' %}
+															<span class="badge bg-primary">{{ tarea.estado }}</span>
+														{% else %}
+															{# Si es finalizado u otro estado, no mostramos nada #}
+														{% endif %}
+														</td>
+														<td>{{ tarea.titulo }}</td>
+														<td>{{ tarea.usuario.nombre }}</td>
+														<td>
+															<a class="btn btn-primary" href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">Editar</a>
+														</td>
+														</tr>
+													{% endif %}
+													{% endfor %}
+													{% if not openTasksExist %}
+													<tr><td colspan="5">No hay tareas abiertas</td></tr>
+													{% endif %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</section>
+							</div>
+						{# final list.tareas abiertas #}
+
+						<!-- Columna derecha: Hilo de tareas -->
+						<div class="col-lg-4">
+							<section class="card">
+								<header class="card-header">
+									<h2 class="card-title">Hilo Tareas</h2>
+								</header>
+								<div class="card-body">
+									<div class="timeline timeline-simple mt-3 mb-3">
+										<div class="tm-body" style="max-height: 300px; overflow-y: auto;">
+											{% if hilos is not empty %}
+												<ol class="tm-items">
+													{% for hilo in hilos %}
+														<li>
+															<div class="tm-box">
+																<p class="text-muted mb-0">
+																	{{ hilo.usuario.nombre }} - {{ hilo.fechaCreacion ? hilo.fechaCreacion|date('d/m/Y H:i') : '' }}
+																</p>
+																<p>{{ hilo.tarea.titulo }}</p>
+																<p>{{ hilo.notas }}</p>
+															</div>
+														</li>
+													{% endfor %}
+												</ol>
+											{% else %}
+												<p>No hay mensajes en el hilo para estas tareas.</p>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						
+					{# final Hilo.tareas abiertas #}
+					{% elseif app.user.super == 2 %}
+						{# principio list.tareas abiertas #}
+					<div class="row">
+						<!-- Columna izquierda: Tabla de tareas -->
+						<div class="col-lg-8">
+							<section class="card">
+								<header class="card-header">
+									<h2 class="card-title">Tareas Abiertas</h2>
+								</header>
+								<div class="card-body">
+									<table class="table table-responsive-md mb-0">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>Estado</th>
+												<th>Título</th>
+												<th>Usuario</th>
+												<th>Acciones</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% set openTasksExist = false %}
+											{% for tarea in opentasks %}
+												{% if tarea.fechafin is null %}
+													{% set openTasksExist = true %}
+													<tr>
+														<td>{{ tarea.id }}</td>
+														<td>
+														{% if tarea.estado == 'activo' %}
+															<span class="badge bg-success">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'pendiente' %}
+															<span class="badge bg-warning text-dark">{{ tarea.estado }}</span>
+														{% elseif tarea.estado == 'inactivo' %}
+															<span class="badge bg-primary">{{ tarea.estado }}</span>
+														{% else %}
+															{# Si es finalizado u otro estado, no mostramos nada #}
+														{% endif %}
+														</td>
+														<td>{{ tarea.titulo }}</td>
+														<td>{{ tarea.usuario.nombre }}</td>
+														<td>
+															<a class="btn btn-primary" href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">Editar</a>
+														</td>
+													</tr>
+												{% endif %}
+											{% endfor %}
+
+											{% if not openTasksExist %}
+												<tr><td colspan="5">No hay tareas abiertas</td></tr>
+											{% endif %}
+										</tbody>
+									</table>
+								</div>
+							</section>
+						</div>
+						{# final list.tareas abiertas #}
+
+				
+					<!-- end: page -->
+					{% endif %}
+{% endblock %}
+
+{% block vendor %}
+		<script src="/assets/vendor/jquery-ui/jquery-ui.js"></script>
+		<script src="/assets/vendor/jqueryui-touch-punch/jquery.ui.touch-punch.js"></script>
+		<script src="/assets/vendor/jquery-appear/jquery.appear.js"></script>
+		<script src="/assets/vendor/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+		<script src="/assets/vendor/jquery.easy-pie-chart/jquery.easypiechart.js"></script>
+		<script src="/assets/vendor/flot/jquery.flot.js"></script>
+		<script src="/assets/vendor/flot.tooltip/jquery.flot.tooltip.js"></script>
+		<script src="/assets/vendor/flot/jquery.flot.pie.js"></script>
+		<script src="/assets/vendor/flot/jquery.flot.categories.js"></script>
+		<script src="/assets/vendor/flot/jquery.flot.resize.js"></script>
+		<script src="/assets/vendor/jquery-sparkline/jquery.sparkline.js"></script>
+		<script src="/assets/vendor/raphael/raphael.js"></script>
+		<script src="/assets/vendor/morris/morris.js"></script>
+		<script src="/assets/vendor/gauge/gauge.js"></script>
+		<script src="/assets/vendor/snap.svg/snap.svg.js"></script>
+		<script src="/assets/vendor/liquid-meter/liquid.meter.js"></script>
+		<script src="/assets/vendor/jqvmap/jquery.vmap.js"></script>
+		<script src="/assets/vendor/jqvmap/data/jquery.vmap.sampledata.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/jquery.vmap.world.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.africa.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.asia.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.australia.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.europe.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.north-america.js"></script>
+		<script src="/assets/vendor/jqvmap/maps/continents/jquery.vmap.south-america.js"></script>
+{% endblock %}
