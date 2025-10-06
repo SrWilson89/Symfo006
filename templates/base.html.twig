@@ -1,39 +1,80 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="{% block html_class %}{% endblock %}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ globals.nombre|default('Dashboard') }}</title>
-    <!-- CSS comunes -->
+    <title>{% block title %}Gestor de Tareas{% endblock %}</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    
+    {# Global CSS #}
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/font-awesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/magnific-popup/magnific-popup.css') }}">
+    
+    {# ESTILOS DEL TEMA (RESTAURADOS/NECESARIOS) #}
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme-elements.css') }}"> {# Necesitas asegurar el contenido de este archivo #}
+    <link rel="stylesheet" href="{{ asset('css/default.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/square-borders.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/extension.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+
+    {% block stylesheets %}{% endblock %}
     {% block head %}{% endblock %}
 </head>
-<body>
-    <!-- Header -->
-    {% include 'partials/header.html.twig' %}
+<body class="{% block body_class %}{% endblock %}">
+    <section class="body">
 
-    <!-- Contenido principal -->
-    <div class="main-content container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-lg-3">
-                {% include 'partials/sidebar.html.twig' %}
-            </div>
-            <!-- Contenido -->
-            <div class="col-lg-9">
-                {% include 'partials/alerts.html.twig' %}
+        {# HEADER (BARRA SUPERIOR) #}
+        {% include 'partials/header.html.twig' %}
+        
+        <div class="inner-wrapper">
+            
+            {# SIDEBAR (BARRA LATERAL IZQUIERDA) #}
+            {% include 'partials/sidebar-left.html.twig' %}
+
+            <section role="main" class="content-body">
+                {% block page_header %}
+                    <header class="page-header">
+                        <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+                        <div class="right-wrapper text-end">
+                            <ol class="breadcrumbs">
+                                <li><a href="{{ path('app_index') }}"><i class="fas fa-home"></i></a></li>
+                                <li><span>{% block breadcrumb_item %}Inicio{% endblock %}</span></li>
+                            </ol>
+                            <a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>
+                        </div>
+                    </header>
+                {% endblock %}
+
+                {# CONTENIDO PRINCIPAL DE LA PÁGINA #}
                 {% block content %}{% endblock %}
-            </div>
+
+            </section>
         </div>
-    </div>
+        
+        {# Alerta personalizada en la parte inferior #}
+        <div class="custom-alert">
+            <p>Hola soy la alerta que queda en el borde de abajo</p>
+        </div>
 
-    <!-- Footer -->
-    {% include 'partials/footer.html.twig' %}
+    </section>
 
-    <!-- Scripts comunes -->
+    {# SCRIPTS JS #}
     <script src="{{ asset('assets/vendor/jquery/jquery.js') }}"></script>
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/magnific-popup/jquery.magnific-popup.js') }}"></script>
+
     {% block vendor %}{% endblock %}
+    
+    {# SCRIPTS DEL TEMA #}
+    <script src="{{ asset('js/theme.js') }}"></script>
+    
+    {# ** IMPORTANTE: SCRIPTS DE INICIALIZACIÓN PARA SOLUCIONAR EL ERROR TypeError ** #}
+    <script src="{{ asset('js/theme.init.js') }}"></script>
+
+    {% block javascripts %}{% endblock %}
+
 </body>
 </html>

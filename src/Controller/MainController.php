@@ -123,7 +123,7 @@ final class MainController extends SuperController
             ['title' => 'User Locked', 'time' => '15 minutes ago'],
         ];
         $upcomingTasks = array_map(
-            fn($t) => ['fecha' => $t->getFechaini() ?? new \DateTime(), 'nombre' => $t->getTitulo()],
+            fn($t) => ['fecha' => $t->getFechaCreacion() ?? new \DateTime(), 'nombre' => $t->getTitulo()],
             $opentasks
         );
         $teamMembers = $userRepository->findBy(['cliente' => $user->getCliente()]) ?? [];
@@ -144,7 +144,8 @@ final class MainController extends SuperController
             'alerts' => $alerts,
             'upcomingTasks' => $upcomingTasks,
             'teamMembers' => array_map(
-                fn($m) => ['nombre' => $m->getNombre(), 'apellidos' => $m->getApellidos(), 'estado' => $m->getActivo() ? 'Activo' : 'Inactivo'],
+                // Línea corregida: Se usa isActivo() para propiedades booleanas de Doctrine
+                fn($m) => ['nombre' => $m->getNombre(), 'apellidos' => $m->getApellidos(), 'estado' => $m->isActivo() ? 'Activo' : 'Inactivo'],
                 $teamMembers
             ),
         ]);

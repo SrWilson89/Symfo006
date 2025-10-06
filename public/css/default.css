@@ -1,0 +1,128 @@
+a {
+	color: #0088CC;
+}
+
+a:hover {
+	color: #0099e6;
+}
+
+a:focus {
+	color: #0099e6;
+}
+
+a:active {
+	color: #0077b3;
+}
+
+html .heading-primary,
+html .lnk-primary,
+html .text-color-primary,
+html .text-primary {
+	color: #0088CC !important;
+}
+
+html .text-color-hover-primary:hover,
+html .text-hover-primary:hover {
+	color: #0088CC !important;
+}
+
+html .heading.heading-primary h1,
+html .heading.heading-primary h2,
+html .heading.heading-primary h3,
+html .heading.heading-primary h4,
+html .heading.heading-primary h5,
+html .heading.heading-primary h6 {
+	border-color: #0088CC;
+}
+
+html .heading-secondary,
+html .lnk-secondary,
+html .text-color-secondary,
+html .text-secondary {
+	color: #E36159 !important;
+}
+
+html .text-color-hover-secondary:hover,
+html .text-hover-secondary:hover {
+	color: #E36159 !important;
+}
+
+html .heading.heading-secondary h1,
+html .heading.heading-secondary h2,
+html .heading.heading-secondary h3,
+html .heading.heading-secondary h4,
+html .heading.heading-secondary h5,
+html .heading.heading-secondary h6 {
+	border-color: #E36159;
+}
+
+/* Colores de Fondo */
+.background-color-primary,
+.bg-primary {
+	background-color: #0088CC !important;
+}
+
+.background-color-secondary,
+.bg-secondary {
+	background-color: #E36159 !important;
+}
+
+.background-color-tertiary,
+.bg-tertiary {
+	background-color: #CCC !important;
+}
+
+/* Datepicker */
+html:not(.sidebar-light) .datepicker.datepicker-dark table tbody tr td.day:hover {
+	background: #0088CC;
+}
+
+html:not(.sidebar-light) .datepicker.datepicker-dark table tbody tr td.day.active {
+	background: #006699;
+}
+
+.datepicker.datepicker-primary table thead tr:first-child {
+	background-color: #0088CC;
+}
+
+.datepicker.datepicker-primary table thead tr:first-child th:hover {
+	background-color: #006699;
+}
+
+.datepicker.datepicker-primary table thead tr:last-child {
+	background-color: #0099e6;
+}
+
+.datepicker.datepicker-primary table thead tr:last-child th:hover {
+	background-color: #0088CC;
+	color: #FFF;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+	background: #0088CC;
+}
+
+/* Tablas */
+.table > thead > tr > td.primary,
+.table > tbody > tr > td.primary,
+.table > tfoot > tr > td.primary,
+.table > thead > tr > th.primary,
+.table > tbody > tr > th.primary,
+.table > tfoot > tr > th.primary,
+.table > thead > tr.primary > td,
+.table > tbody > tr.primary > td,
+.table > tfoot > tr.primary > td,
+.table > thead > tr.primary > th,
+.table > tbody > tr.primary > th,
+.table > tfoot > tr.primary > th {
+	background-color: #0088CC !important;
+	color: #FFF !important;
+}
+
+.table-hover > tbody > tr > td.primary:hover,
+.table-hover > tbody > tr > th.primary:hover,
+.table-hover > tbody > tr.primary:hover > td,
+.table-hover > tbody > tr:hover > .primary,
+.table-hover > tbody > tr.primary:hover > th {
+	background-color: #0077b3 !important;
+}

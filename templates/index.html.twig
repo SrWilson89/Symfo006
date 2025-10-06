@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+    {# Asegúrate de que tienes acceso a app.user antes de usarlo #}
     {% if app.user and app.user.super is defined %}
         {% if app.user.super == 0 or app.user.super == 1 %}
             {# Dashboard para Super Admin o Admin #}
@@ -13,7 +14,6 @@
 
             {# Tabla de tareas abiertas y hilo de tareas #}
             <div class="row">
-                <!-- Tabla de tareas -->
                 <div class="col-lg-8">
                     <section class="card">
                         <header class="card-header">
@@ -31,163 +31,47 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {# La variable que envía el MainController es 'opentasks' #}
                                     {% set openTasksExist = false %}
                                     {% for tarea in opentasks %}
-                                        {% if tarea.fechafin is null %}
-                                            {% set openTasksExist = true %}
-                                            <tr>
-                                                <td>{{ tarea.id|default('N/A') }}</td>
-                                                <td>
-                                                    {% if tarea.estado.nombre|default('') == 'activo' %}
-                                                        <span class="badge bg-success">{{ tarea.estado.nombre|default('Activo') }}</span>
-                                                    {% elseif tarea.estado.nombre|default('') == 'pendiente' %}
-                                                        <span class="badge bg-warning text-dark">{{ tarea.estado.nombre|default('Pendiente') }}</span>
-                                                    {% elseif tarea.estado.nombre|default('') == 'inactivo' %}
-                                                        <span class="badge bg-primary">{{ tarea.estado.nombre|default('Inactivo') }}</span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary">{{ tarea.estado.nombre|default('Desconocido') }}</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ tarea.titulo|default('Sin título') }}</td>
-                                                <td>{{ tarea.usuario.nombre|default('Sin usuario') }}</td>
-                                                <td>
-                                                    <a class="btn btn-primary" href="{{ path('app_edit_tarea', {'id': tarea.id|default(0)}) }}">Editar</a>
-                                                </td>
-                                            </tr>
-                                        {% endif %}
+                                        {% set openTasksExist = true %}
+                                        <tr>
+                                            <td>{{ tarea.id }}</td>
+                                            <td><span class="badge badge-primary">{{ tarea.estado.nombre | capitalize }}</span></td>
+                                            <td><a href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">{{ tarea.titulo }}</a></td>
+                                            <td>{{ tarea.usuario.nombre | default('N/A') }}</td>
+                                            <td class="actions">
+                                                <a href="{{ path('app_edit_tarea', {'id': tarea.id}) }}" class="on-default edit-row" title="Editar"><i class="fas fa-pencil-alt"></i></a>
+                                                <a href="{{ path('app_delete_tarea', {'id': tarea.id}) }}" class="on-default remove-row text-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar la tarea ID: {{ tarea.id }}?');" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                                            </td>
+                                        </tr>
                                     {% endfor %}
-                                    {% if not openTasksExist %}
-                                        <tr><td colspan="5">No hay tareas abiertas</td></tr>
-                                    {% endif %}
                                 </tbody>
                             </table>
+                            {% if not openTasksExist %}
+                                <div class="alert alert-info">No hay tareas abiertas.</div>
+                            {% endif %}
                         </div>
                     </section>
                 </div>
-                <!-- Hilo de tareas -->
                 <div class="col-lg-4">
-                    <section class="card">
-                        <header class="card-header">
-                            <h2 class="card-title">Hilo Tareas</h2>
-                        </header>
-                        <div class="card-body">
-                            <div class="timeline timeline-simple mt-3 mb-3">
-                                <div class="tm-body" style="max-height: 300px; overflow-y: auto;">
-                                    {% if hilos is not empty %}
-                                        <ol class="tm-items">
-                                            {% for hilo in hilos %}
-                                                <li>
-                                                    <div class="tm-box">
-                                                        <p class="text-muted mb-0">
-                                                            {{ hilo.usuario.nombre|default('Anónimo') }} - {{ hilo.fechaCreacion ? hilo.fechaCreacion|date('d/m/Y H:i') : 'N/A' }}
-                                                        </p>
-                                                        <p>{{ hilo.tarea.titulo|default('Sin tarea') }}</p>
-                                                        <p>{{ hilo.notas|default('Sin notas') }}</p>
-                                                    </div>
-                                                </li>
-                                            {% endfor %}
-                                        </ol>
-                                    {% else %}
-                                        <p>No hay mensajes en el hilo para estas tareas.</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    {% include 'partials/hilos-widget.html.twig' %}
                 </div>
             </div>
 
-        {% elseif app.user.super == 2 %}
-            {# Dashboard para Usuario #}
-            <div class="row">
-                <!-- Tabla de tareas -->
-                <div class="col-lg-8">
-                    <section class="card">
-                        <header class="card-header">
-                            <h2 class="card-title">Tareas Abiertas</h2>
-                        </header>
-                        <div class="card-body">
-                            <table class="table table-responsive-md mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Estado</th>
-                                        <th>Título</th>
-                                        <th>Usuario</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set openTasksExist = false %}
-                                    {% for tarea in opentasks %}
-                                        {% if tarea.fechafin is null %}
-                                            {% set openTasksExist = true %}
-                                            <tr>
-                                                <td>{{ tarea.id|default('N/A') }}</td>
-                                                <td>
-                                                    {% if tarea.estado.nombre|default('') == 'activo' %}
-                                                        <span class="badge bg-success">{{ tarea.estado.nombre|default('Activo') }}</span>
-                                                    {% elseif tarea.estado.nombre|default('') == 'pendiente' %}
-                                                        <span class="badge bg-warning text-dark">{{ tarea.estado.nombre|default('Pendiente') }}</span>
-                                                    {% elseif tarea.estado.nombre|default('') == 'inactivo' %}
-                                                        <span class="badge bg-primary">{{ tarea.estado.nombre|default('Inactivo') }}</span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary">{{ tarea.estado.nombre|default('Desconocido') }}</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ tarea.titulo|default('Sin título') }}</td>
-                                                <td>{{ tarea.usuario.nombre|default('Sin usuario') }}</td>
-                                                <td>
-                                                    <a class="btn btn-primary" href="{{ path('app_edit_tarea', {'id': tarea.id|default(0)}) }}">Editar</a>
-                                                </td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if not openTasksExist %}
-                                        <tr><td colspan="5">No hay tareas abiertas</td></tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-            </div>
+            {% include 'partials/dashboard-charts.html.twig' %}
 
         {% else %}
-            <div class="alert alert-warning">Rol de usuario no válido. Por favor, inicia sesión nuevamente.</div>
+            {# Dashboard para usuarios normales (si aplica) #}
+            <h2>Bienvenido, {{ app.user.nombre }}.</h2>
+            {# Aquí puedes incluir código específico para usuarios no administradores #}
         {% endif %}
     {% else %}
-        <div class="alert alert-warning">Debes iniciar sesión para ver el dashboard.</div>
-        <a href="{{ path('app_login') }}" class="btn btn-primary">Iniciar Sesión</a>
+        {# Manejo si no hay usuario autenticado (aunque el security.yaml lo debería evitar) #}
+        <p>Por favor, inicie sesión.</p>
     {% endif %}
 {% endblock %}
 
-{% block vendor %}
-    <script src="{{ asset('assets/vendor/jquery/jquery.js') }}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jquery-ui/jquery-ui.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqueryui-touch-punch/jquery.ui.touch-punch.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jquery-appear/jquery.appear.js') }}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap-multiselect/js/bootstrap-multiselect.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jquery.easy-pie-chart/jquery.easypiechart.js') }}"></script>
-    <script src="{{ asset('assets/vendor/flot/jquery.flot.js') }}"></script>
-    <script src="{{ asset('assets/vendor/flot.tooltip/jquery.flot.tooltip.js') }}"></script>
-    <script src="{{ asset('assets/vendor/flot/jquery.flot.pie.js') }}"></script>
-    <script src="{{ asset('assets/vendor/flot/jquery.flot.categories.js') }}"></script>
-    <script src="{{ asset('assets/vendor/flot/jquery.flot.resize.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jquery-sparkline/jquery.sparkline.js') }}"></script>
-    <script src="{{ asset('assets/vendor/raphael/raphael.js') }}"></script>
-    <script src="{{ asset('assets/vendor/morris/morris.js') }}"></script>
-    <script src="{{ asset('assets/vendor/gauge/gauge.js') }}"></script>
-    <script src="{{ asset('assets/vendor/snap.svg/snap.svg.js') }}"></script>
-    <script src="{{ asset('assets/vendor/liquid-meter/liquid.meter.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/jquery.vmap.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/data/jquery.vmap.sampledata.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/jquery.vmap.world.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.africa.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.asia.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.australia.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.europe.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.north-america.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jqvmap/maps/continents/jquery.vmap.south-america.js') }}"></script>
+{% block javascripts %}
+    {# Aquí van tus scripts para el Dashboard #}
 {% endblock %}

@@ -1,0 +1,45 @@
+{# templates/partials/hilos-widget.html.twig #}
+<section class="card">
+    <header class="card-header">
+        <h2 class="card-title">Última Actividad (Hilos)</h2>
+    </header>
+    <div class="card-body">
+        
+        {# Comprobamos si la variable 'hilos' existe y no está vacía #}
+        {% if hilos is not empty %}
+            <div class="recent-activity">
+                <ul class="activity-list list-unstyled">
+                    {# Itera sobre los objetos Hilos #}
+                    {% for hilo in hilos %}
+                        <li class="mb-3 pb-2 border-bottom">
+                            <div class="activity-item">
+                                <div class="activity-body">
+                                    <p class="mb-0">
+                                        {# Muestra quién hizo la actividad #}
+                                        <strong>{{ hilo.usuario.nombre | default('Sistema') }}</strong>
+                                        
+                                        {# Muestra a qué tarea se refiere, si existe #}
+                                        {% if hilo.tarea %}
+                                            en tarea <a href="{{ path('app_edit_tarea', {'id': hilo.tarea.id}) }}">#{{ hilo.tarea.id }}</a>
+                                        {% endif %}
+                                    </p>
+                                    {# Muestra la nota del hilo #}
+                                    <p class="text-muted text-3 mb-0">"{{ hilo.notas | raw }}"</p>
+                                </div>
+                                <div class="activity-meta text-right">
+                                    {# Muestra la hora y fecha de creación #}
+                                    <span class="text-muted text-2">{{ hilo.fechaCreacion | date('H:i') }}</span>
+                                    <span class="text-muted text-2 d-block">{{ hilo.fechaCreacion | date('d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No hay actividad reciente registrada.
+            </div>
+        {% endif %}
+    </div>
+</section>

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\Estados;
 use App\Entity\Clientes;
 use App\Entity\Tareas;
@@ -10,8 +9,7 @@ use App\Entity\User;
 use App\Entity\Hilos;
 use App\Form\Type\TareasType;
 use App\Utils\Paginator;
-
-
+use App\Repository\TareasRepository; // <<-- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ PRESENTE
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +18,26 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class TareaController extends SuperController
 {
+    // 1. MÉTODO DE LISTADO: Define la ruta 'app_tarea_index' y PASA la variable 'tareas'
+    #[Route('/tareas', name: 'app_tarea_index')]
+    public function listado(TareasRepository $tareaRepository): Response
+    {
+        // 1. Obtener todas las tareas de la base de datos
+        $tareas = $tareaRepository->findAll();
+
+        // 2. Configuración de migas de pan (breadcrumb)
+        // Asumiendo que 'globals' viene de SuperController
+        $this->globals['breadcrums'][] = "Tareas";
+
+        // 3. Renderizar la plantilla y pasar la variable 'tareas'
+        return $this->render('tarea/index.html.twig', [
+            'tareas' => $tareas, // <<-- ESTA ES LA VARIABLE QUE FALTABA
+            'globals' => $this->globals,
+        ]);
+    }
+
+
+    // 2. MÉTODO DE CREAR/EDITAR
     #[Route('/tarea', name: 'app_add_tarea')]
     #[Route('/tarea/{id}', name: 'app_edit_tarea')]
     public function tarea(Tareas $object = null, request $request): Response
@@ -34,6 +52,7 @@ final class TareaController extends SuperController
                 $object->setModificacion(new \DateTime);
                 $managerUser = $this->em->getRepository(User::class)->find($this->getUser()->getId());
                 $object->setUsuario($managerUser);
+                // NOTA: Si getCliente() es un objeto, necesitarás $object->setCliente($managerUser->getCliente());
                 $object->setCliente($managerUser->getCliente()->getId());
                 $isNew = true;
             }
