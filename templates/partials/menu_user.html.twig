@@ -1,0 +1,16 @@
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item">
+        <a class="nav-link" href="#">Estados</a>
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item"><a class="nav-link" href="{{ path('app_list', {'entity': 'estados'}) }}">Lista</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ path('app_create_estado') }}">Crear</a></li>
+        </ul>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Tareas</a>
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item"><a class="nav-link" href="{{ path('app_list', {'entity': 'tareas'}) }}">Lista</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ path('app_create_tarea') }}">Crear</a></li>
+        </ul>
+    </li>
+</ul>

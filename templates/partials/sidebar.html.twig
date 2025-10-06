@@ -1,0 +1,29 @@
+{# templates/partials/sidebar.html.twig #}
+<aside class="sidebar">
+    <h4>Navegación</h4>
+    <ul class="nav nav-pills flex-column">
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_index') }}">Inicio</a></li>
+        {% if app.user and app.user.super is defined %}
+            {% if app.user.super == 0 %}
+                {% include 'partials/menu_super.html.twig' %}
+            {% elseif app.user.super == 1 %}
+                {% include 'partials/menu_admin.html.twig' %}
+            {% elseif app.user.super == 2 %}
+                {% include 'partials/menu_user.html.twig' %}
+            {% endif %}
+        {% endif %}
+    </ul>
+    {% if app.user and app.user.super == 1 and app.user.cliente is not null and app.user.cliente.checking == true %}
+        {% set ahora = "now"|date("U") %}
+        {% set diferencia = app.user.cliente.testat|date("U") - ahora %}
+        {% set dias = (diferencia // 86400) %}
+        {% set horas = ((diferencia % 86400) // 3600) %}
+        <p>
+            {% if diferencia > 0 %}
+                El periodo de prueba finaliza en {{ dias }} día{% if dias != 1 %}s{% endif %} {{ horas }}h
+            {% else %}
+                El periodo de prueba ha finalizado
+            {% endif %}
+        </p>
+    {% endif %}
+</aside>

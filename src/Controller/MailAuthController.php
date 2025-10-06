@@ -1,4 +1,4 @@
-<?php 
+<?php
 // src/Controller/MailAuthController.php
 
 namespace App\Controller;
@@ -20,18 +20,19 @@ class MailAuthController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        // 1. Verificar si el usuario está autenticado (aunque el error 404 sugiere que sí lo está, pero falta el cliente)
+        // 1. Verificar si el usuario está autenticado
         if (!$user) {
-            // Este caso es poco probable si estás viendo la 404 del cliente, pero es una buena práctica.
-            return $this->redirectToRoute('app_login'); 
+            return $this->redirectToRoute('app_login');
         }
 
         // 2. Intentar obtener la entidad Cliente a través de la relación del objeto User
         $client = $user->getCliente();
 
-        // Esta es la línea 35 donde se lanza la excepción si $client es null
+        // Manejo si $client es null
         if (!$client instanceof Cliente) {
-            throw $this->createNotFoundException('No se ha encontrado el cliente asociado al usuario.');
+            // En lugar de throw, agregar mensaje flash y redirigir
+            $this->addFlash('error', 'No se ha encontrado el cliente asociado al usuario. Por favor, contacta al administrador.');
+            return $this->redirectToRoute('app_index'); // O a una página de error personalizada
         }
 
         // ... resto de la lógica de configuración de mail usando $client

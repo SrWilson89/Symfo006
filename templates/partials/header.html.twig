@@ -1,0 +1,100 @@
+<header class="header">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">{{ globals.nombre|default('Dashboard') }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% if is_granted('IS_IMPERSONATOR') %}
+                        {% set impersonatedName = ((app.user.nombre ?? '') ~ ' ' ~ (app.user.apellidos ?? ''))|trim %}
+                        {% if impersonatedName is empty %}
+                            {% set impersonatedName = app.user.email %}
+                        {% endif %}
+                        <li class="nav-item">
+                            <span class="nav-link">Impersonando a {{ impersonatedName }}</span>
+                            <a href="#" class="nav-link">Volver a mi rol</a>
+                        </li>
+                    {% endif %}
+                    <!-- Notificaciones -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <span class="badge bg-primary">{{ pendingTasks|default(0) }}</span> Tareas
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if tasks is defined and tasks|length > 0 %}
+                                {% for task in tasks|slice(0, 3) %}
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            {{ task.nombre }} - {{ task.progreso }}%
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><a class="dropdown-item" href="#">No hay tareas pendientes</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <span class="badge bg-primary">{{ unreadMessages|default(0) }}</span> Mensajes
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if messages is defined and messages|length > 0 %}
+                                {% for message in messages|slice(0, 4) %}
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            {{ message.sender.nombre }}: {{ message.preview|slice(0, 50) }}...
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                <li><a class="dropdown-item" href="#">Ver todos</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="#">No hay mensajes</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <span class="badge bg-primary">{{ alerts|default([])|length }}</span> Alertas
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if alerts is defined and alerts|length > 0 %}
+                                {% for alert in alerts|slice(0, 3) %}
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            {{ alert.title }} - {{ alert.time }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                <li><a class="dropdown-item" href="#">Ver todas</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="#">No hay alertas</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <!-- Perfil -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            {{ app.user.nombre }} {{ app.user.apellidos }}
+                            <span>
+                                {% if app.user.super == 0 %}SUPER
+                                {% elseif app.user.super == 1 %}ADMIN
+                                {% elseif app.user.super == 2 %}USUARIO
+                                {% else %}DESCONOCIDO{% endif %}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                            {% if app.user.super == 1 %}
+                                <li><a class="dropdown-item" href="#">Bloquear Pantalla</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="#">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

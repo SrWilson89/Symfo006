@@ -1,5 +1,47 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+# config/routes.yaml
+app_index:
+    path: /
+    controller: App\Controller\MainController::main
+app_list:
+    path: /list/{entity}
+    controller: App\Controller\ListController::list
+    defaults: { entity: null }
+
+app_edit_tarea:
+    path: /tareas/editar/{id}
+    controller: App\Controller\TareaController::edit
+    requirements:
+        id: '\d+'
+
+# Rutas para crear entidades (temporales, puedes ajustarlas según tus necesidades)
+app_create_empresa:
+    path: /empresas/crear
+    controller: App\Controller\EmpresaController::create
+
+app_create_usuario:
+    path: /usuarios/crear
+    controller: App\Controller\UsuarioController::create
+
+app_create_estado:
+    path: /estados/crear
+    controller: App\Controller\EstadoController::create
+
+app_create_tarea:
+    path: /tareas/crear
+    controller: App\Controller\TareaController::create
+
+app_create_producto:
+    path: /productos/crear
+    controller: App\Controller\ProductoController::create
+
+app_create_detalle:
+    path: /detalles/crear
+    controller: App\Controller\DetalleController::create
+
+app_create_presupuesto:
+    path: /presupuestos/crear
+    controller: App\Controller\PresupuestoController::create
+
+app_mail:
+    path: /mail
+    controller: App\Controller\MailController::index
