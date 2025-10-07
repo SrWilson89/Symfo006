@@ -14,6 +14,12 @@ security:
                 property: email
     
     firewalls:
+        # INICIO de la modificación: Añadir el firewall 'dev'
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        # FIN de la modificación
+        
         main:
             pattern: ^/
             # Se ELIMINA la línea 'anonymous: true' (ya corregido)

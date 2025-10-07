@@ -3,6 +3,8 @@
 {% block content %}
     <form method="post" class="w-100">
         <div class="card-body">
+            
+            {# Botones de Añadir y Exportar #}
             <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
                 <a href="{{ path_to_add }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Añadir
@@ -26,141 +28,91 @@
                         </li>
                     </ul>
                 </div>
+                {# FIN Exportación #}
+
+                {# Espacio para el formulario de filtros si lo tienes #}
             </div>
-        </div>
-
-        <div class="card-body">
-            <table class="table table-responsive-md table-hover mb-0">
-                <thead>
-                    <tr>
-                        {% for field, options in pagination.field_titles %}
-                            <th>
-                                <label class="form-label small">{{ options.title }}</label>
-                                <input type="text" name="filters[{{ field }}]" value="{{ filters[field]|default('') }}" class="form-control form-control-sm" />
-                            </th>
-                        {% endfor %}
-                        <th class="align-bottom">
-                            <button class="btn btn-primary btn-sm w-100" type="submit">
-                                <i class="fas fa-search"></i> Filtrar
-                            </button>
-                            <a href="{{ path('app_list', { entity: entity }) }}" class="btn btn-secondary btn-sm w-100">
-                                <i class="fas fa-eraser"></i> Resetear
-                            </a>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in pagination.items %}
-                        <tr {% if item.row_url is defined %}class="clickable-row" data-href="{{ item.row_url }}"{% endif %}>
-                            {% for field, options in pagination.field_titles %}
-                                {% set value = attribute(item.entity, field) %}
-                                {% set type = options.type|default('text') %}
-
-                                <td>
-                                    {% if type == 'bool' %}
-                                        {% if value %}
-                                            <button type="button" class="btn btn-success"><i class="fas fa-check"></i></button>
-                                        {% else %}
-                                            <button type="button" class="btn btn-danger"><i class="fas fa-xmark"></i></button>
-                                        {% endif %}
-                                    {% elseif type == 'date' %}
-                                        {{ value ? value|date('Y-m-d H:i') : '(vacío)' }}
-                                    {% elseif type == 'list' %}
-                                        {{ value is iterable ? value|join(', ') : value }}
-                                    {% elseif type == 'html' %}
-                                        {{ value|raw }}
-                                    {% elseif type == 'badge' %}
-                                        {% set color = attribute(item.entity, 'color') %}
-                                        <span class="badge" style="background-color: {{ color }}; color: white;">{{ value }}</span>
-                                    {% else %}
-                                        {% if value is null %}
-                                            <em>(vacío)</em>
-                                        {% elseif value is iterable %}
-                                            {{ value|join(', ') }}
-                                        {% elseif value is same as(true) %}
-                                            Sí
-                                        {% elseif value is same as(false) %}
-                                            No
-                                        {% elseif value.timestamp is defined %}
-                                            {{ value|date('Y-m-d H:i') }}
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                            {% endfor %}
-
-                            <td>
-                                {% if item.links is defined %}
-                                    {% for link in item.links %}
-                                        <a href="{{ link.url }}"
-                                           class="btn btn-{{ link.color|default('primary') }} btn-sm mb-1 me-1"
-                                           title="{{ link.text }}">
-                                            {% if link.icon is defined %}
-                                                <i class="fas {{ link.icon }}"></i>
-                                            {% endif %}
-                                            {{ link.text }}
-                                        </a>
-                                    {% endfor %}
-                                {% endif %}
-                            </td>
+            
+            <div class="table-responsive mt-3">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Nombre Completo</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
                         </tr>
-                    {% else %}
-                        <tr><td colspan="{{ pagination.field_titles|length + 1 }}">No hay resultados.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {# CORRECCIÓN 1 (Paginación): Se usa .results en lugar de .items #}
+                        {% for row in pagination.results %} 
 
-            <div class="row align-items-center mt-3">
-                <div class="col-auto">
-                    <form method="get" id="limitForm">
-                        <label for="limitSelect" class="form-label me-2">Elementos por página:</label>
-                        <select name="limit" id="limitSelect" class="form-select d-inline-block w-auto" onchange="document.getElementById('limitForm').submit()">
-                            {% for opt in [5,10,25,50,100] %}
-                                <option value="{{ opt }}" {% if opt == limit %}selected{% endif %}>{{ opt }}</option>
-                            {% endfor %}
-                        </select>
-
-                        {# Mantener otros parámetros GET para no perder filtros ni página al cambiar límite #}
-                        {% for key, value in app.request.query.all %}
-                            {% if key != 'limit' %}
-                                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                            {# CORRECCIÓN 2 (Rutas): Se fuerza el nombre de la entidad a singular para las rutas (ej. 'usuario' en vez de 'usuarios') #}
+                            {% set route_entity_name = entity %}
+                            {% if entity == 'usuarios' %}
+                                {% set route_entity_name = 'usuario' %}
                             {% endif %}
+                        
+                            {# Enlace de la fila (Línea 58 aprox) #}
+                            <tr class="clickable-row" data-href="{{ path('app_edit_' ~ route_entity_name, {'id': row.id}) }}">
+                                
+                                {# CORRECCIÓN 3 (Propiedad de Entidad): Se usan propiedades reales de App\Entity\User #}
+                                <td>{{ row.id }}</td>
+                                <td>{{ row.email }}</td>
+                                <td>{{ row.nombre }} {{ row.apellidos }}</td>
+                                
+                                <td>
+                                    {% if row.super == 0 %}<span class="badge bg-danger">SUPER</span>
+                                    {% elseif row.super == 1 %}<span class="badge bg-warning">ADMIN</span>
+                                    {% elseif row.super == 2 %}<span class="badge bg-info">USUARIO</span>
+                                    {% else %}<span class="badge bg-secondary">N/D</span>{% endif %}
+                                </td>
+                                
+                                <td class="actions">
+                                    <a href="{{ path('app_edit_' ~ route_entity_name, {'id': row.id}) }}" class="on-default edit-row text-primary" title="Editar"><i class="fas fa-pencil-alt"></i></a>
+                                    <a href="{{ path('app_delete_' ~ route_entity_name, {'id': row.id}) }}" class="on-default remove-row text-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar el elemento ID: {{ row.id }}?');" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
                         {% endfor %}
-                    </form>
-                </div>
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="col">
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+            {# Paginación #}
+            <div class="row pt-3">
+                <div class="col-lg-6">
+                    {% set from_record = ((pagination.current_page - 1) * pagination.limit) + 1 %}
+                    
+                    {# CORRECCIÓN 1 (Paginación): Se usa .results|length en lugar de .items|length #}
+                    {% set to_record = from_record + pagination.results|length - 1 %}
+                    
+                    {% set total_records = pagination.total_items %}
+                    Mostrando {{ from_record }} a {{ to_record }} de {{ total_records }} registros.
+                </div>
+                <div class="col-lg-6 text-end">
+                    <div class="btn-group">
                         {# Primera y Anterior #}
                         {% if pagination.current_page > 1 %}
                             <a href="?page=1{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Primera</a>
                             <a href="?page={{ pagination.current_page - 1 }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">Anterior</a>
                         {% endif %}
 
-                        {# Páginas numéricas dinámicas #}
-                        {% set start = max(1, pagination.current_page - 1) %}
-                        {% set end = min(pagination.total_pages, pagination.current_page + 1) %}
-
-                        {% if start > 1 %}
-                            <a href="?page=1{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">1</a>
-                            {% if start > 2 %}
-                                <span class="btn btn-outline-secondary disabled">…</span>
-                            {% endif %}
-                        {% endif %}
-
-                        {% for i in start..end %}
-                            {% if i == pagination.current_page %}
-                                <span class="btn btn-primary">{{ i }}</span>
-                            {% else %}
-                                <a href="?page={{ i }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-primary">{{ i }}</a>
-                            {% endif %}
+                        {# Páginas cercanas #}
+                        {% set start_page = (pagination.current_page - 2) > 0 ? (pagination.current_page - 2) : 1 %}
+                        {% set end_page = (pagination.current_page + 2) < pagination.total_pages ? (pagination.current_page + 2) : pagination.total_pages %}
+                        
+                        {% for i in start_page..end_page %}
+                            <a href="?page={{ i }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn {% if i == pagination.current_page %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ i }}</a>
                         {% endfor %}
 
-                        {% if end < pagination.total_pages %}
-                            {% if end < pagination.total_pages - 1 %}
-                                <span class="btn btn-outline-secondary disabled">…</span>
-                            {% endif %}
+                        {# Puntos suspensivos (si no se muestra la última página) #}
+                        {% if end_page < pagination.total_pages - 1 %}
+                            <span class="btn btn-outline-secondary disabled">…</span>
+                        {% endif %}
+
+                        {# Muestra la última página solo si no está en el rango cercano #}
+                        {% if end_page < pagination.total_pages %}
                             <a href="?page={{ pagination.total_pages }}{% if limit %}&limit={{ limit }}{% endif %}" class="btn btn-outline-secondary">{{ pagination.total_pages }}</a>
                         {% endif %}
 
@@ -172,6 +124,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
     </form>
 {% endblock %}
@@ -180,14 +133,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('tr.clickable-row').forEach(function (row) {
-                row.addEventListener('click', function () {
+                row.addEventListener('click', function (event) {
                     const href = row.getAttribute('data-href');
                     if (href) {
-                        window.location.href = href;
+                        // Impedir la navegación si se hizo clic en un botón de acción (editar/eliminar)
+                        if (!event.target.closest('.actions a')) {
+                            window.location.href = href;
+                        }
                     }
                 });
             });
         });
     </script>
 {% endblock %}
-

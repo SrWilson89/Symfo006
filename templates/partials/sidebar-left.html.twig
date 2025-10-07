@@ -1,13 +1,13 @@
 {# templates/partials/sidebar-left.html.twig #}
 {% set current_path = app.request.attributes.get('_route') %}
 
-<aside id="sidebar-left" class="sidebar-left">
+<aside id="sidebar-left" class="sidebar-left" style="background-color: #343a40;">
     <div class="sidebar-header">
-        <div class="sidebar-title">
+        <div class="sidebar-title" style="color: #adb5bd;">
             Navegación
         </div>
         <div class="sidebar-toggle d-none d-md-block" data-toggle-class="sidebar-left-collapsed" data-target="html" data-fire-event="sidebar-left-toggle">
-            <i class="fas fa-bars" aria-label="Toggle sidebar"></i>
+            <i class="fas fa-bars" aria-label="Toggle sidebar" style="color: #adb5bd;"></i>
         </div>
     </div>
 
@@ -17,7 +17,7 @@
                 <ul class="nav nav-main">
                     {# DASHBOARD / INICIO #}
                     <li class="{{ current_path == 'app_index' ? 'nav-active' : '' }}">
-                        <a class="nav-link" href="{{ path('app_index') }}">
+                        <a class="nav-link" href="{{ path('app_index') }}" style="color: #fff;">
                             <i class="fas fa-home" aria-hidden="true"></i>
                             <span>Dashboard</span>
                         </a>
@@ -25,13 +25,21 @@
 
                     {# GESTIÓN DE TAREAS #}
                     <li class="{{ current_path starts with 'app_tarea_' ? 'nav-active' : '' }}">
-                        <a class="nav-link" href="{{ path('app_tarea_index') }}">
+                        <a class="nav-link" href="{{ path('app_list', {'entity': 'tareas'}) }}" style="color: #fff;">
                             <i class="fas fa-tasks" aria-hidden="true"></i>
                             <span>Tareas</span>
                         </a>
                     </li>
 
-                    {# Puedes añadir más enlaces aquí, por ejemplo, Clientes, Usuarios, etc. #}
+                    {# GESTIÓN DE USUARIOS (Ejemplo añadido) #}
+                    {% if app.user.super == 0 or app.user.super == 1 %}
+                        <li class="{{ current_path starts with 'app_usuario_' ? 'nav-active' : '' }}">
+                            <a class="nav-link" href="{{ path('app_list', {'entity': 'usuarios'}) }}" style="color: #fff;">
+                                <i class="fas fa-users" aria-hidden="true"></i>
+                                <span>Usuarios</span>
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>

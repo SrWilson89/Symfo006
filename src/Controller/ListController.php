@@ -47,449 +47,66 @@ final class ListController extends SuperController
         switch ($entity) {
             case 'cliente':
                 $paginator = new Paginator($this->em, Clientes::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles([
-                        'id' => 'ID',
-                        'activo' => ['title' => 'Activo', 'type' => 'bool'],
-                        'nombre' => 'Nombre',
-                        'cif' => 'CIF',
-                        'codigopostal' => 'Cod Postal',
-                        'pais' => 'Pais',
-                        'localidad' => 'Localidad',
-                        'provincia' => 'Provincia',
-                        'fechcreacion' => 'Creacion',
-                        'modificacion' => 'Modificacion'
-                    ]);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_cliente', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_cliente', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_cliente', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado Clientes";
-                $this->globals['breadcrumbs'][] = 'Clientes';
-                $path_to_add = $this->generateUrl('app_add_cliente');
+                $path_to_add = $this->generateUrl('app_create_cliente');
                 break;
-
-            case 'User':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-                if ($this->getUser()->getSuper() == 0){
-
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'activo' => ['title' => 'Activo', 'type' => 'bool'],
-                        'cliente' => 'Empresa',
-                        'super' => 'Super',
-                    ];
-                 }
-                 $FieldTitles += [
-                        'nombre' => 'Nombre',
-                        'apellidos' => 'Apellidos',
-                        'nif' => 'Nif',
-                        'email' => 'Email',
-                        'telefono' => 'Teléfono',
-                        'fechacreacion' => 'Creacion',
-                        'modificacion' => 'Modificacion'
-                    ];
+            case 'user': // Alias para 'usuarios'
+            case 'usuarios':
                 $paginator = new Paginator($this->em, User::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-        
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(function ($entity) {
-                            $links = [
-                                [
-                                    'text' => 'EDITAR',
-                                    'url' => $this->generateUrl('app_edit_user', ['id' => $entity->getId()]),
-                                    'color' => 'primary',
-                                    'icon' => 'fa-edit',
-                                ],
-                                [
-                                    'text' => 'BORRAR',
-                                    'url' => $this->generateUrl('app_delete_user', ['id' => $entity->getId()]),
-                                    'color' => 'danger',
-                                    'icon' => 'fa-remove',
-                                ],
-                            ];
-
-                            if (
-                                $this->isGranted('ROLE_ADMIN')
-                                && $this->getUser()
-                                && $this->getUser()->getId() !== $entity->getId()
-                            ){
-                                $links[] = [
-                                    
-                                    'text' => 'IMPERSONAR',
-                                    'url' => $this->generateUrl('app_index', ['_switch_user' => $entity->getEmail()]),
-                                    'color' => 'warning',
-                                    'icon' => 'fa-user-secret',
-                                ];
-
-                            }
-                            return $links;
-                        })
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_user', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado Usuarios";
-                $path_to_add = $this->generateUrl('app_add_user');
-                $this->globals['breadcrumbs'][] = 'Usuario';
+                $path_to_add = $this->generateUrl('app_create_usuario');
                 break;
-
-            case 'Estado':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-
-                if ($this->getUser()->getSuper() == 0){
-                    
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'cliente' => 'Empresa',
-                        'nombre' => ['title' => 'Nombre', 'type' => 'badge'],
-                        
-                    ];
-                } 
-                    $FieldTitles += [
-                        'cliente' => 'Empresa',
-                        'nombre' => ['title' => 'Nombre', 'type' => 'badge'],
-                        
-                    ];
-
+            case 'estados':
                 $paginator = new Paginator($this->em, Estados::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_estado', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_estado', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_estado', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado de Estados";
-                $this->globals['breadcrumbs'][] = 'Estados';
-                $path_to_add = $this->generateUrl('app_add_estado');
+                $path_to_add = $this->generateUrl('app_create_estado');
                 break;
-            case 'Tarea':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-                /*if ($this->getUser()->getSuper() == 0){
-
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'estado' => 'Estado',
-                        'fechacreacion' => 'Fecha_Creacion',
-                        'modificacion' => 'Modificacion',
-                        'titulo' => 'Titulo',
-                        'notas' => 'Notas',
-                        'usuario' => 'Usuario'
-                    ];
-                }*/
-                    //TODO Ajustar solo DEV
-                    if ($this->getUser()->getSuper() == 0){
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'estado' => 'Estado',
-                        'fechacreacion' => 'Fecha_Creacion',
-                        'modificacion' => 'Modificacion',
-                        'titulo' => 'Titulo',
-                        'notas' => 'Notas',
-                        'usuario' => 'Usuario'
-                    ];
-                }
-                    $FieldTitles += [
-                        'estado' => 'Estado',
-                        'fechacreacion' => 'Fecha_Creacion',
-                        'modificacion' => 'Modificacion',
-                        'titulo' => 'Titulo',
-                        'notas' => 'Notas',
-                        'usuario' => 'Usuario'
-                    ];
-                
-                 
-                
+            case 'tareas':
                 $paginator = new Paginator($this->em, Tareas::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_tarea', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_tarea', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_tarea', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado de Tareas";
-                $this->globals['breadcrumbs'][] = 'Tareas';
-                $path_to_add = $this->generateUrl('app_add_tarea');
+                $path_to_add = $this->generateUrl('app_create_tarea');
                 break;
-
-            case 'Producto':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-
-                if ($this->getUser()->getSuper() == 0){
-                    
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'nombre' => 'Nombre',
-                        'precio' => 'Precio',
-                        'iva' => 'Iva',
-                        'fechacreacion' => 'FechaCreacion',
-                        'modificacion' => 'Modificacion'
-                        
-                    ];
-                } 
-                    $FieldTitles += [
-                        
-                        
-                    ];
-
+            case 'productos':
                 $paginator = new Paginator($this->em, Productos::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_producto', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_producto', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_producto', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado de Productos";
-                $this->globals['breadcrumbs'][] = 'Productos';
-                $path_to_add = $this->generateUrl('app_add_producto');
+                $path_to_add = $this->generateUrl('app_create_producto');
                 break;
-
-            case 'Detalle':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-
-                if ($this->getUser()->getSuper() == 0){
-                    
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'producto' => 'Producto',
-                        'precio' => 'Precio',
-                        'iva' => 'Iva',
-                        'cantidad' => 'Cantidad',
-                    ];
-                } 
-                    $FieldTitles += [];
-
+            case 'detalles':
                 $paginator = new Paginator($this->em, Detalles::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_detalle', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_detalle', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_detalle', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado de Detalles";
-                $this->globals['breadcrumbs'][] = 'Detalles';
-                $path_to_add = $this->generateUrl('app_add_detalle');
+                $path_to_add = $this->generateUrl('app_create_detalle');
                 break;
-            case 'Presupuesto':
-                if ($this->getUser()->getSuper() !== 0){
-                    $filters['cliente'] = $this->getUser()->getCliente();
-                }
-                $FieldTitles = [];
-
-                if ($this->getUser()->getSuper() == 0){
-                    
-                    $FieldTitles = [
-                        'id' => 'ID',
-                        'direccion' => 'Direccion',
-                        'fechacreacion' => 'FechaCreacion',
-                        'modificacion' => 'Modificacion',
-                        'detalle' => 'Detalle',
-                        'tipo' => ['title' => 'Tipo', 'type' => 'bool'],
-                        'numref' => 'NumRef',
-                        'estado' => 'Estado'
-                    ];
-                } 
-                    $FieldTitles += [];
-
+            case 'presupuestos':
                 $paginator = new Paginator($this->em, Presupuestos::class);
-
-                $paginator
-                    ->setPage($page)
-                    ->setLimit($limit)
-                    ->setOrderBy('id', 'ASC')
-                    ->setCriteria($filters)
-                    ->setFieldTitles($FieldTitles);
-
-                if (!$isExport) {
-                    $paginator
-                        ->setLinksGenerator(fn($entity) => [
-                            [
-                                'text' => 'EDITAR',
-                                'url' => $this->generateUrl('app_edit_presupuesto', ['id' => $entity->getId()]),
-                                'color' => 'primary',
-                                'icon' => 'fa-edit',
-                            ],
-                            [
-                                'text' => 'BORRAR',
-                                'url' => $this->generateUrl('app_delete_presupuesto', ['id' => $entity->getId()]),
-                                'color' => 'danger',
-                                'icon' => 'fa-remove',
-                            ]
-                        ])
-                        ->setRowClickUrlGenerator(fn($entity) => $this->generateUrl('app_edit_presupuesto', ['id' => $entity->getId()]));
-                }
-
-                $this->globals['nombre'] = "Listado de Presupuestos";
-                $this->globals['breadcrumbs'][] = 'Presupuestos';
-                $path_to_add = $this->generateUrl('app_add_presupuesto');
-                break;    
-            default:
-                throw $this->createNotFoundException("Entidad '$entity' no es soportada");
+                $path_to_add = $this->generateUrl('app_create_presupuesto');
                 break;
+
+            default:
+                throw $this->createNotFoundException(sprintf('Entidad \'%s\' no es soportada', $entity));
+        }
+        
+        // CORRECCIÓN CLAVE: Obtener los datos de paginación ANTES de usarlos
+        if ($paginator !== null) {
+            $pagination = $paginator->paginate($page, $limit, $filters);
         }
 
-        $pagination = $paginator->paginate();
-
         if ($isExport) {
-            if (!isset($pagination['field_titles']) || !isset($pagination['items'])) {
-                throw new \Exception("No se encontraron datos para exportar");
-            }
-
-            $fieldKeys = array_keys($pagination['field_titles']);
             $headers = [];
-
-            foreach ($pagination['field_titles'] as $key => $opt) {
-                $headers[] = is_array($opt) ? $opt['title'] : $opt;
+            
+            // Si pagination tiene field_titles, los usamos para los encabezados de exportación
+            if (isset($pagination['field_titles'])) {
+                foreach ($pagination['field_titles'] as $options) {
+                    $headers[] = $options['title'];
+                }
             }
 
             $data = [];
-            foreach ($pagination['items'] as $itemData) {
-                $entityObj = $itemData['entity'];
+            // Recorremos los resultados de la paginación para formatear los datos
+            foreach ($pagination['results'] as $item) {
                 $row = [];
+                foreach ($pagination['field_titles'] as $field => $options) {
+                    $value = $item->{'get' . ucfirst($field)}();
 
-                foreach ($fieldKeys as $field) {
-                    $getter = 'get' . ucfirst($field);
-                    $value = method_exists($entityObj, $getter) ? $entityObj->$getter() : null;
-                    $type = $pagination['field_titles'][$field]['type'] ?? 'text';
-
-                    switch ($type) {
-                        case 'bool':
+                    switch (true) {
+                        case ($options['type'] === 'bool'):
                             $value = $value ? 'Sí' : 'No';
                             break;
-                        case 'date':
-                            $value = $value instanceof \DateTimeInterface ? $value->format('d/m/Y H:i') : '';
-                            break;
-                        case 'list':
-                            $value = is_iterable($value) ? implode(', ', (array)$value) : $value;
-                            break;
-                        case 'html':
-                            $value = strip_tags((string)$value);
+                        case ($options['type'] === 'currency'):
+                            $value = number_format($value, 2, ',', '.') . '€';
                             break;
                         default:
                             if ($value instanceof \DateTimeInterface) {

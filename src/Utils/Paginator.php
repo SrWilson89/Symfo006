@@ -3,152 +3,121 @@
 namespace App\Utils;
 
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Clientes;
+use App\Entity\User;
+use App\Entity\Estados;
+use App\Entity\Tareas;
+use App\Entity\Productos;
+use App\Entity\Detalles;
+use App\Entity\Presupuestos;
 
 class Paginator
 {
     private EntityManagerInterface $em;
     private string $entityClass;
-    private int $page = 1;
-    private ?int $limit = 10;
-    private ?string $orderBy = null;
-    private string $orderDirection = 'ASC';
-    private array $criteria = [];
 
-    private $rowClickUrlGenerator = null;
-    private array $fieldTitles = [];
-    private $linksGenerator = null;
+    /**
+     * Definiciones de campos por entidad. CRÍTICO para que el listado sepa
+     * qué columnas mostrar (field_titles) y cómo aplicar filtros.
+     */
+    private array $fieldDefinitions = [
+        Clientes::class => [
+            'id' => ['title' => 'ID', 'type' => 'int'],
+            'nombre' => ['title' => 'Nombre Cliente', 'type' => 'text'],
+            'email' => ['title' => 'Email', 'type' => 'text'],
+        ],
+        User::class => [
+            'id' => ['title' => 'ID', 'type' => 'int'],
+            'email' => ['title' => 'Email', 'type' => 'text'],
+            'nombre' => ['title' => 'Nombre', 'type' => 'text'],
+            'apellidos' => ['title' => 'Apellidos', 'type' => 'text'],
+            'super' => ['title' => 'Rol', 'type' => 'int'],
+        ],
+        Tareas::class => [
+            'id' => ['title' => 'ID', 'type' => 'int'],
+            'titulo' => ['title' => 'Título', 'type' => 'text'],
+            // Las relaciones deben tener un type 'relation' para hacer el JOIN
+            'estado' => ['title' => 'Estado', 'type' => 'relation'],
+            'usuario' => ['title' => 'Asignado a', 'type' => 'relation'], 
+            'fechaCreacion' => ['title' => 'F. Creación', 'type' => 'date'],
+        ],
+        Estados::class => [
+            'id' => ['title' => 'ID', 'type' => 'int'],
+            'nombre' => ['title' => 'Nombre', 'type' => 'text'],
+        ],
+        // Añade el resto de entidades (Productos, Detalles, Presupuestos...)
+        // para que también funcionen si las necesitas.
+    ];
 
     public function __construct(EntityManagerInterface $em, string $entityClass)
     {
         $this->em = $em;
         $this->entityClass = $entityClass;
+
+        if (!isset($this->fieldDefinitions[$this->entityClass])) {
+            throw new \InvalidArgumentException(
+                sprintf('No se han definido campos para la entidad "%s" en Paginator.php', $entityClass)
+            );
+        }
     }
 
-    public function setPage(int $page): self
+    public function paginate(int $page = 1, ?int $limit = 10, array $filters = []): array
     {
-        $this->page = max(1, $page);
-        return $this;
-    }
-
-    public function setLimit(?int $limit): self
-    {
-        // Si limit es null, significa sin límite
-        $this->limit = $limit;
-        return $this;
-    }
-
-    public function setOrderBy(?string $orderBy, string $orderDirection = 'ASC'): self
-    {
-        $this->orderBy = $orderBy;
-        $this->orderDirection = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
-        return $this;
-    }
-
-    public function setCriteria(array $criteria): self
-    {
-        $this->criteria = $criteria;
-        return $this;
-    }
-
-    /**
-     * fieldTitles: array con keys de campos, y valores con array ['title' => string, 'type' => string]
-     */
-    public function setFieldTitles(array $fieldTitles): self
-    {
-        foreach ($fieldTitles as $field => $value) {
-            if (is_string($value)) {
-                $this->fieldTitles[$field] = ['title' => $value, 'type' => 'text'];
-            } elseif (is_array($value) && isset($value['title'])) {
-                if (!isset($value['type'])) {
-                    $value['type'] = 'text';
-                }
-                $this->fieldTitles[$field] = $value;
-            } else {
-                throw new \InvalidArgumentException("El formato para el campo '$field' no es válido.");
+        $fields = $this->fieldDefinitions[$this->entityClass];
+        $alias = 'e';
+        
+        $qb = $this->em->getRepository($this->entityClass)->createQueryBuilder($alias);
+        
+        // 1. Manejo de relaciones (CRÍTICO para Tareas/User)
+        // Hacemos JOIN y SELECT para evitar problemas de carga perezosa (Lazy Loading)
+        foreach ($fields as $fieldName => $options) {
+            if ($options['type'] === 'relation') {
+                $qb->leftJoin($alias . '.' . $fieldName, $fieldName) 
+                   ->addSelect($fieldName);
             }
         }
-        return $this;
-    }
-
-    public function setLinksGenerator(?callable $callback): self
-    {
-        $this->linksGenerator = $callback;
-        return $this;
-    }
-
-    public function setRowClickUrlGenerator(?callable $callback): self
-    {
-        $this->rowClickUrlGenerator = $callback;
-        return $this;
-    }
-
-    public function paginate(): array
-    {
-        $repository = $this->em->getRepository($this->entityClass);
-        $qb = $repository->createQueryBuilder('e');
-
-        foreach ($this->criteria as $field => $value) {
-            if ($value === null || $value === '' || (is_array($value) && count($value) === 0)) {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $qb->andWhere($qb->expr()->in('e.' . $field, ':' . $field))
-                    ->setParameter($field, $value);
-            } elseif (is_string($value)) {
-                $qb->andWhere($qb->expr()->like('LOWER(e.' . $field . ')', ':' . $field))
-                    ->setParameter($field, '%' . strtolower($value) . '%');
-            } else {
-                $qb->andWhere('e.' . $field . ' = :' . $field)
-                    ->setParameter($field, $value);
+        
+        // 2. Aplicar Filtros (lógica básica)
+        foreach ($filters as $field => $value) {
+            if (!empty($value) && isset($fields[$field])) {
+                // Si el campo es relacional, filtramos por la representación de la relación (ej. __toString())
+                $fieldAlias = ($fields[$field]['type'] === 'relation') ? $field : $alias;
+                
+                // Usamos LIKE para búsquedas parciales
+                $qb->andWhere($fieldAlias . '.' . $field . ' LIKE :' . $field)
+                   ->setParameter($field, '%' . $value . '%');
             }
         }
 
-        if ($this->orderBy) {
-            $qb->orderBy('e.' . $this->orderBy, $this->orderDirection);
+        // 3. Obtener el total de elementos (para la paginación)
+        $countQueryBuilder = clone $qb;
+        $countQueryBuilder->select('COUNT(' . $alias . '.id)')
+                          ->resetDQLPart('orderBy')
+                          ->setMaxResults(null)
+                          ->setFirstResult(null);
+
+        $totalItems = $countQueryBuilder->getQuery()->getSingleScalarResult();
+        
+        // 4. Calcular la paginación
+        $totalPages = (int) ceil($totalItems / ($limit ?? $totalItems));
+        $page = max(1, min($page, $totalPages > 0 ? $totalPages : 1));
+        $offset = ($page - 1) * $limit;
+
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+            $qb->setFirstResult($offset);
         }
-
-        $countQb = clone $qb;
-        $countQb->select('COUNT(e)');
-        $totalItems = (int) $countQb->getQuery()->getSingleScalarResult();
-
-        if ($this->limit !== null) {
-            $qb->setFirstResult(($this->page - 1) * $this->limit)
-               ->setMaxResults($this->limit);
-        }
-
-        $items = $qb->getQuery()->getResult();
-
-        $itemsWithLinks = [];
-
-        foreach ($items as $item) {
-            $rowClickUrl = null;
-
-            if ($this->rowClickUrlGenerator !== null) {
-                $rowClickUrl = call_user_func($this->rowClickUrlGenerator, $item);
-            }
-
-            $entry = ['entity' => $item];
-
-            if ($this->linksGenerator !== null) {
-                $entry['links'] = call_user_func($this->linksGenerator, $item);
-            }
-
-            if ($rowClickUrl !== null) {
-                $entry['row_url'] = $rowClickUrl;
-            }
-
-            $itemsWithLinks[] = $entry;
-        }
-
+        
+        // 5. Obtener los resultados finales
+        $results = $qb->getQuery()->getResult();
+        
         return [
-            'items' => $itemsWithLinks,
-            'total_items' => $totalItems,
-            'current_page' => $this->page,
-            'limit' => $this->limit,
-            'total_pages' => $this->limit !== null ? (int) ceil($totalItems / $this->limit) : 1,
-            'field_titles' => $this->fieldTitles,
-            'criteria' => $this->criteria,
+            'results' => $results,
+            'total_items' => (int) $totalItems,
+            'total_pages' => $totalPages,
+            'current_page' => $page,
+            'limit' => $limit,
+            'field_titles' => $fields, // Ahora contiene las definiciones para Tareas y User
         ];
     }
 }

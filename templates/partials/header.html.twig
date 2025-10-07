@@ -1,6 +1,9 @@
-<header class="header">
+<header class="{% if is_granted('IS_IMPERSONATOR') %}impersonation-mode{% endif %}" style="background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,.08);">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
+            {# Toggle para la barra lateral (Se añadió 'd-lg-none' para esconder en desktop, si aplica) #}
+            <a class="sidebar-toggle d-lg-none" data-open="sidebar-left"><i class="fas fa-bars"></i></a>
+
             <a class="navbar-brand" href="#">{{ globals.nombre|default('Dashboard') }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
@@ -13,68 +16,27 @@
                             {% set impersonatedName = app.user.email %}
                         {% endif %}
                         <li class="nav-item">
-                            <span class="nav-link">Impersonando a {{ impersonatedName }}</span>
-                            <a href="#" class="nav-link">Volver a mi rol</a>
+                            {# Estilo para la alerta de impersonación #}
+                            <span class="nav-link badge bg-warning text-dark me-2">
+                                Impersonando a {{ impersonatedName }}
+                            </span>
+                            <a href="{{ path('homepage', {'_switch_user': '_exit'}) }}" class="nav-link d-inline-block">
+                                <i class="fas fa-undo-alt"></i> Volver a mi rol
+                            </a>
                         </li>
                     {% endif %}
-                    <!-- Notificaciones -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                             <span class="badge bg-primary">{{ pendingTasks|default(0) }}</span> Tareas
                         </a>
                         <ul class="dropdown-menu">
-                            {% if tasks is defined and tasks|length > 0 %}
-                                {% for task in tasks|slice(0, 3) %}
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            {{ task.nombre }} - {{ task.progreso }}%
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            {% else %}
-                                <li><a class="dropdown-item" href="#">No hay tareas pendientes</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <span class="badge bg-primary">{{ unreadMessages|default(0) }}</span> Mensajes
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if messages is defined and messages|length > 0 %}
-                                {% for message in messages|slice(0, 4) %}
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            {{ message.sender.nombre }}: {{ message.preview|slice(0, 50) }}...
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                                <li><a class="dropdown-item" href="#">Ver todos</a></li>
-                            {% else %}
-                                <li><a class="dropdown-item" href="#">No hay mensajes</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <span class="badge bg-primary">{{ alerts|default([])|length }}</span> Alertas
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if alerts is defined and alerts|length > 0 %}
-                                {% for alert in alerts|slice(0, 3) %}
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            {{ alert.title }} - {{ alert.time }}
-                                        </a>
-                                    </li>
-                                {% endfor %}
+                            {% if pendingTasks|default(0) > 0 %}
                                 <li><a class="dropdown-item" href="#">Ver todas</a></li>
                             {% else %}
                                 <li><a class="dropdown-item" href="#">No hay alertas</a></li>
                             {% endif %}
                         </ul>
                     </li>
-                    <!-- Perfil -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                             {{ app.user.nombre }} {{ app.user.apellidos }}
@@ -86,11 +48,11 @@
                             </span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Mi Perfil</a></li> {# Cambiado de app_user_profile a # #}
                             {% if app.user.super == 1 %}
-                                <li><a class="dropdown-item" href="#">Bloquear Pantalla</a></li>
+                                <li><a class="dropdown-item" href="#">Bloquear Pantalla</a></li> {# Cambiado de #}
                             {% endif %}
-                            <li><a class="dropdown-item" href="#">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_logout') }}">Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>

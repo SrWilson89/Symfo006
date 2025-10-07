@@ -13,5 +13,32 @@
     line-height: 50px;
     height: 50px;
     font-weight: bold;
+}
 
-}/* Add here all your CSS customizations */
+/* Estilos Personalizados para Tarjetas y Tablas (Modernización) */
+
+/* Estilo para las tarjetas: añade una sombra suave para darles profundidad */
+.card-modern {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    border: none; /* Elimina el borde duro por defecto */
+}
+
+/* Mejora la legibilidad de la tabla con líneas de cebra y padding */
+.table-striped-modern tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa; /* Gris muy claro para las filas impares */
+}
+.table-striped-modern th, .table-striped-modern td {
+    padding: 1rem; /* Más espacio dentro de las celdas */
+    vertical-align: middle;
+}
+
+/* Estilo de los botones de acción para que sean más discretos */
+.table-actions a {
+    margin-right: 0.5rem;
+    opacity: 0.8; /* Ligeramente transparentes hasta el hover */
+    transition: opacity 0.2s;
+}
+.table-actions a:hover {
+    opacity: 1;
+}

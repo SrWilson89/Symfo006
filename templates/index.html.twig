@@ -2,7 +2,9 @@
 {% extends 'base.html.twig' %}
 
 {% block head %}
+    <!-- Mantener tu script de Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- IMPORTANTE: El bloque <style> inline ha sido eliminado. Sus estilos están ahora en 'custom.css' -->
 {% endblock %}
 
 {% block content %}
@@ -15,12 +17,14 @@
             {# Tabla de tareas abiertas y hilo de tareas #}
             <div class="row">
                 <div class="col-lg-8">
-                    <section class="card">
+                    {# APLICAMOS 'card-modern' a la tarjeta principal de tareas #}
+                    <section class="card card-modern"> 
                         <header class="card-header">
                             <h2 class="card-title">Tareas Abiertas</h2>
                         </header>
                         <div class="card-body">
-                            <table class="table table-responsive-md mb-0">
+                            {# APLICAMOS 'table-striped-modern' a la tabla y 'table-actions' a las celdas de acciones #}
+                            <table class="table table-responsive-md mb-0 table-striped-modern"> 
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -31,17 +35,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {# La variable que envía el MainController es 'opentasks' #}
+                                    {# La variable 'openTasks' debe estar disponible para la plantilla #}
                                     {% set openTasksExist = false %}
-                                    {% for tarea in opentasks %}
+                                    {% for tarea in openTasks|default([]) %}
                                         {% set openTasksExist = true %}
                                         <tr>
                                             <td>{{ tarea.id }}</td>
-                                            <td><span class="badge badge-primary">{{ tarea.estado.nombre | capitalize }}</span></td>
-                                            <td><a href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">{{ tarea.titulo }}</a></td>
-                                            <td>{{ tarea.usuario.nombre | default('N/A') }}</td>
-                                            <td class="actions">
-                                                <a href="{{ path('app_edit_tarea', {'id': tarea.id}) }}" class="on-default edit-row" title="Editar"><i class="fas fa-pencil-alt"></i></a>
+                                            <td><span class="badge bg-primary">{{ tarea.estado }}</span></td>
+                                            <td>{{ tarea.titulo }}</td>
+                                            <td>{{ tarea.usuario.nombre }}</td>
+                                            <td class="table-actions"> 
+                                                <a href="{{ path('app_view_tarea', {'id': tarea.id}) }}" class="on-default edit-row text-info" title="Ver/Editar"><i class="far fa-edit"></i></a>
                                                 <a href="{{ path('app_delete_tarea', {'id': tarea.id}) }}" class="on-default remove-row text-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar la tarea ID: {{ tarea.id }}?');" title="Eliminar"><i class="far fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
@@ -49,7 +53,7 @@
                                 </tbody>
                             </table>
                             {% if not openTasksExist %}
-                                <div class="alert alert-info">No hay tareas abiertas.</div>
+                                <div class="alert alert-info mt-3">No hay tareas abiertas.</div>
                             {% endif %}
                         </div>
                     </section>
