@@ -9,6 +9,31 @@
             padding: 30px;
             background: #f8f9fa;
             min-height: 100vh;
+            /* >>> COMIENZO DE CAMBIOS PARA EL SIDEBAR <<< */
+            margin-left: 280px; /* Margen para compensar el sidebar de 280px */
+            transition: margin-left 0.3s ease; /* Para la animación de colapsado */
+            /* >>> FIN DE CAMBIOS PARA EL SIDEBAR <<< */
+        }
+
+        /* Responsive para Sidebar Colapsado */
+        /* Nota: Necesitarás añadir la clase 'sidebar-left-collapsed' al <body> o <html>
+           cuando el sidebar se colapse, o asegurarte de que tu framework lo haga. */
+        .sidebar-left-collapsed .dashboard-container {
+            margin-left: 70px; /* Margen reducido para el sidebar colapsado */
+        }
+
+        /* Responsive Móvil */
+        @media (max-width: 767px) {
+            .dashboard-container {
+                margin-left: 0; /* Sin margen en móvil */
+                padding: 15px; /* Ya estaba, pero lo dejamos */
+            }
+        }
+        /* Dashboard Container */
+        .dashboard-container {
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
         }
 
         /* Welcome Section */
@@ -470,7 +495,6 @@
                     this.style.background = '';
                 });
             });
-
             // Confirm delete with better styling
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(btn => {

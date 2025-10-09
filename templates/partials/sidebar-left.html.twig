@@ -1,5 +1,16 @@
 {# templates/partials/sidebar-left.html.twig #}
 {% set current_path = app.request.attributes.get('_route') %}
+{# Obtener el parámetro 'entity' para la lógica de listados #}
+{% set current_entity = app.request.attributes.get('entity') %}
+
+{# LÓGICA DEL ESTADO ACTIVO #}
+{# Tareas: Activo si la ruta es 'app_list' con entity='tareas' o si empieza por 'app_tarea_' #}
+{% set is_tareas_active = (current_path starts with 'app_tarea_') or (current_path == 'app_list' and current_entity == 'tareas') %}
+{# Usuarios: Activo si la ruta es 'app_list' con entity='usuarios' o si empieza por 'app_usuario_' #}
+{% set is_usuarios_active = (current_path starts with 'app_usuario_') or (current_path == 'app_list' and current_entity == 'usuarios') %}
+{# Configuración (Padre): Activo si la ruta actual es 'app_profile' o 'app_config_notifications' #}
+{% set is_config_parent_active = current_path == 'app_profile' or current_path == 'app_config_notifications' %}
+
 
 <aside id="sidebar-left" class="sidebar-left">
     <div class="sidebar-header">
@@ -31,19 +42,18 @@
                     </li>
 
                     {# GESTIÓN DE TAREAS #}
-                    <li class="nav-item {{ current_path starts with 'app_tarea_' ? 'nav-active' : '' }}">
+                    <li class="nav-item {{ is_tareas_active ? 'nav-active' : '' }}">
                         <a class="nav-link" href="{{ path('app_list', {'entity': 'tareas'}) }}">
                             <span class="nav-icon">
                                 <i class="fas fa-tasks" aria-hidden="true"></i>
                             </span>
                             <span class="nav-text">Tareas</span>
-                            <span class="nav-badge badge badge-primary">3</span>
                         </a>
                     </li>
 
                     {# GESTIÓN DE USUARIOS #}
                     {% if app.user.super == 0 or app.user.super == 1 %}
-                        <li class="nav-item {{ current_path starts with 'app_usuario_' ? 'nav-active' : '' }}">
+                        <li class="nav-item {{ is_usuarios_active ? 'nav-active' : '' }}">
                             <a class="nav-link" href="{{ path('app_list', {'entity': 'usuarios'}) }}">
                                 <span class="nav-icon">
                                     <i class="fas fa-users" aria-hidden="true"></i>
@@ -53,9 +63,10 @@
                         </li>
                     {% endif %}
 
-                    {# SECCIÓN CON SUBMENU (Ejemplo) #}
-                    <li class="nav-item nav-parent {{ current_path starts with 'app_config_' ? 'nav-expanded nav-active' : '' }}">
-                        <a class="nav-link" href="#" data-toggle="collapse">
+                    {# SECCIÓN CON SUBMENU: CONFIGURACIÓN (CORREGIDO) #}
+                    <li class="nav-item nav-parent {{ is_config_parent_active ? 'nav-expanded nav-active' : '' }}">
+                        {# AHORA SE NAVEGA DIRECTAMENTE A app_profile cuando se hace clic en el padre #}
+                        <a class="nav-link" href="{{ path('app_profile') }}">
                             <span class="nav-icon">
                                 <i class="fas fa-cog" aria-hidden="true"></i>
                             </span>
@@ -65,13 +76,15 @@
                             </span>
                         </a>
                         <ul class="nav nav-children">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
+                            {# Enlace Perfil (usa la ruta existente 'app_profile') #}
+                            <li class="nav-item {{ current_path == 'app_profile' ? 'nav-active' : '' }}">
+                                <a class="nav-link" href="{{ path('app_profile') }}">
                                     <span class="nav-text">Perfil</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
+                            {# Enlace Notificaciones (usa la nueva ruta 'app_config_notifications') #}
+                            <li class="nav-item {{ current_path == 'app_config_notifications' ? 'nav-active' : '' }}">
+                                <a class="nav-link" href="{{ path('app_config_notifications') }}">
                                     <span class="nav-text">Notificaciones</span>
                                 </a>
                             </li>
@@ -96,6 +109,7 @@
     </div>
 </aside>
 
+{# Estilos CSS #}
 <style>
 /* Sidebar Principal */
 .sidebar-left {
@@ -355,18 +369,29 @@
 .nav-item:nth-child(4) { animation-delay: 0.25s; }
 </style>
 
+{# Script para manejar el toggle de submenús y el sidebar #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Toggle para submenús
     document.querySelectorAll('.nav-parent > .nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
             const parent = this.closest('.nav-parent');
+            
+            // Si el enlace tiene data-toggle="collapse" (como antes) o si su href es solo '#',
+            // prevenimos el comportamiento por defecto (navegación).
+            // NOTA: Hemos quitado data-toggle="collapse" del enlace de Configuración para que navegue.
+            if (this.getAttribute('href') === '#') {
+                e.preventDefault();
+            }
+            
+            // Toggle de la clase nav-expanded para expandir/colapsar el submenú
+            // Esto se ejecuta sin importar si navegamos o no, pero el submenú solo
+            // se mostrará si la página no cambia.
             parent.classList.toggle('nav-expanded');
         });
     });
 
-    // Toggle mobile
+    // Toggle móvil del sidebar
     const toggleBtn = document.querySelector('.sidebar-toggle');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', function() {

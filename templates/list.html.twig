@@ -1,12 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Listado de Tareas{% endblock %}
-{% block page_title %}Gestión de Tareas{% endblock %}
-{% block breadcrumb_item %}Tareas{% endblock %}
+{# Bloques adaptados para ser genéricos #}
+{% block title %}Listado de {{ entity|capitalize }}{% endblock %}
+{% block page_title %}Gestión de {{ entity|capitalize }}{% endblock %}
+{% block breadcrumb_item %}{{ entity|capitalize }}{% endblock %}
 
 {% block head %}
     <style>
         /* Container Principal */
+        /* Nota: Puedes necesitar ajustar el margin-left en el contenedor principal si estás usando un sidebar. */
         .task-list-container {
             padding-left: 25%;
             width: 75%;
@@ -132,7 +134,7 @@
 
         .table-modern {
             margin: 0;
-            width: 80%;
+            width: 100%; /* Mejorado para un mejor responsive */
         }
 
         .table-modern thead {
@@ -212,6 +214,17 @@
         .status-cancelada {
             background: #f8d7da;
             color: #842029;
+        }
+
+        /* User Roles (Añadidos para el listado de usuarios) */
+        .status-admin {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-regular {
+            background: #e3f2fd;
+            color: #1976d2;
         }
 
         /* User Info */
@@ -379,6 +392,10 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .task-list-container {
+                padding-left: 0;
+                width: 100%;
+            }
             .card-header-modern {
                 padding: 20px;
             }
@@ -434,58 +451,48 @@
         <section class="card-modern">
             <header class="card-header-modern">
                 <h2 class="card-title-modern">
-                    <i class="fas fa-tasks"></i>
-                    Listado de Tareas
+                    {# El icono se adapta automáticamente #}
+                    <i class="fas fa-{{ entity == 'usuarios' ? 'users' : 'tasks' }}"></i> Listado de {{ entity|capitalize }}
                 </h2>
-                
                 <div class="toolbar-actions">
-                    <a href="{{ path('app_add_tarea') }}" class="btn-modern btn-add">
-                        <i class="fas fa-plus"></i>
-                        Nueva Tarea
+                    {# FIX DE RUTA: Usa app_add_usuario o app_add_tarea condicionalmente #}
+                    {% set add_route = entity == 'usuarios' ? 'app_add_usuario' : 'app_add_tarea' %}
+                    <a href="{{ path(add_route) }}" class="btn-modern btn-add">
+                        <i class="fas fa-plus"></i> Nuevo/a {{ entity|slice(0, -1)|capitalize }}
                     </a>
-
+                    
                     <div class="export-dropdown dropdown">
-                        <button class="btn-modern btn-export dropdown-toggle" 
-                                type="button" 
-                                id="exportDropdown" 
-                                data-bs-toggle="dropdown" 
-                                aria-expanded="false">
-                            <i class="fas fa-file-export"></i>
-                            Exportar
+                        <button class="btn-modern btn-export dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-file-export"></i> Exportar
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end" 
-                            aria-labelledby="exportDropdown">
+                        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end" aria-labelledby="exportDropdown">
                             <li>
-                                <a class="dropdown-item-modern" 
-                                   href="{{ path('app_list', app.request.query.all | merge({ entity: 'tareas', format: 'pdf' })) }}">
-                                    <i class="fas fa-file-pdf text-danger"></i>
-                                    Exportar a PDF
+                                <a class="dropdown-item-modern" href="{{ path('app_list', app.request.query.all | merge({ entity: entity, format: 'pdf' })) }}">
+                                    <i class="fas fa-file-pdf text-danger"></i> Exportar a PDF
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item-modern" 
-                                   href="{{ path('app_list', app.request.query.all | merge({ entity: 'tareas', format: 'excel' })) }}">
-                                    <i class="fas fa-file-excel text-success"></i>
-                                    Exportar a Excel
+                                <a class="dropdown-item-modern" href="{{ path('app_list', app.request.query.all | merge({ entity: entity, format: 'excel' })) }}">
+                                    <i class="fas fa-file-excel text-success"></i> Exportar a Excel
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
             </header>
-
             <div class="card-body p-0">
                 {% if pagination.results is empty %}
                     <div class="empty-state">
                         <div class="empty-state-icon">
                             <i class="fas fa-inbox"></i>
                         </div>
-                        <h3 class="empty-state-title">No hay tareas registradas</h3>
+                        <h3 class="empty-state-title">No hay {{ entity }} registrados</h3>
                         <p class="empty-state-text">
-                            Comienza creando tu primera tarea para gestionar tu trabajo.
+                            Comienza creando tu primer/a {{ entity|slice(0, -1) }}.
                         </p>
-                        <a href="{{ path('app_add_tarea') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Crear Primera Tarea
+                        {# Usa la ruta corregida para el botón del estado vacío #}
+                        <a href="{{ path(add_route) }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear {{ entity|slice(0, -1)|capitalize }}
                         </a>
                     </div>
                 {% else %}
@@ -494,71 +501,94 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Título</th>
-                                    <th>Estado</th>
-                                    <th>Usuario</th>
+                                    {# CAMBIO DE TÍTULO PARA ADAPTARSE AL CONTEXTO #}
+                                    <th>{{ entity == 'usuarios' ? 'Email' : 'Título' }}</th>
+                                    
+                                    {# CORRECCIÓN DE COLUMNA: ESTADO vs ROL #}
+                                    <th>{{ entity == 'usuarios' ? 'Rol' : 'Estado' }}</th>
+                                    
+                                    {# CAMBIO DE TÍTULO PARA ADAPTARSE AL CONTEXTO #}
+                                    <th>{{ entity == 'usuarios' ? 'Nombre Completo' : 'Usuario' }}</th>
+                                    
                                     <th>Fecha Creación</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for tarea in pagination.results %}
-                                    <tr class="clickable-row" 
-                                        data-href="{{ path('app_edit_tarea', {'id': tarea.id}) }}">
+                                {# Usamos 'item' en lugar de 'tarea' para hacerlo genérico #}
+                                {% for item in pagination.results %}
+                                    {# Lógica condicional para definir las rutas específicas (app_edit_usuario o app_edit_tarea) #}
+                                    {% set edit_route = entity == 'usuarios' ? 'app_edit_usuario' : 'app_edit_tarea' %}
+                                    {% set delete_route = entity == 'usuarios' ? 'app_delete_usuario' : 'app_delete_tarea' %}
+                                    
+                                    {% set edit_path = path(edit_route, {'id': item.id}) %}
+                                    {% set delete_path = path(delete_route, {'id': item.id}) %}
+
+                                    <tr class="clickable-row" data-href="{{ edit_path }}">
                                         <td>
-                                            <span class="task-id-badge">#{{ tarea.id }}</span>
+                                            <span class="task-id-badge">#{{ item.id }}</span>
                                         </td>
                                         
+                                        {# Columna de Título / Email #}
                                         <td>
-                                            <strong>{{ tarea.titulo | default('Sin título') }}</strong>
+                                            {% if entity == 'usuarios' %}
+                                                <strong>{{ item.email | default('Sin Email') }}</strong>
+                                            {% else %}
+                                                <strong>{{ item.titulo | default('Sin título') }}</strong>
+                                            {% endif %}
                                         </td>
                                         
+                                        {# Lógica para ESTADO vs ROL (donde estaba el error 503 original) #}
                                         <td>
-                                            {% if tarea.estado %}
-                                                {% set estado_class = 'status-' ~ (tarea.estado.nombre|lower|replace({' ': '-'})) %}
+                                            {% if entity == 'usuarios' %}
+                                                {# Lógica para mostrar el ROL del USUARIO #}
+                                                {% set role_value = item.super | default(0) %}
+                                                {% set role_name = role_value == 1 ? 'Administrador' : 'Usuario Regular' %}
+                                                {% set role_class = role_value == 1 ? 'status-admin' : 'status-regular' %}
+                                                <span class="status-badge {{ role_class }}">
+                                                    {{ role_name }}
+                                                </span>
+                                            {% elseif item.estado %}
+                                                {# Lógica original para el ESTADO de la TAREA #}
+                                                {% set estado_class = 'status-' ~ (item.estado.nombre|lower|replace({' ': '-'})) %}
                                                 <span class="status-badge {{ estado_class }}">
-                                                    {{ tarea.estado.nombre | capitalize }}
+                                                    {{ item.estado.nombre | capitalize }}
                                                 </span>
                                             {% else %}
+                                                {# Estado por defecto si es Tarea y no tiene estado #}
                                                 <span class="status-badge status-pendiente">Pendiente</span>
                                             {% endif %}
                                         </td>
                                         
+                                        {# Columna de Usuario / Nombre Completo #}
                                         <td>
-                                            {% if tarea.usuario %}
-                                                <div class="user-info-cell">
-                                                    <div class="user-avatar-small">
-                                                        {{ tarea.usuario.nombre|slice(0, 2)|upper }}
-                                                    </div>
-                                                    <span class="user-name">
-                                                        {{ tarea.usuario.nombre | default('N/A') }}
-                                                    </span>
+                                            <div class="user-info-cell">
+                                                {% set user_object = entity == 'usuarios' ? item : item.usuario %}
+                                                
+                                                {% set name_to_display = user_object.nombre ~ ' ' ~ user_object.apellidos | default('N/A') %}
+                                                {% set initials = user_object.nombre|slice(0, 1)|upper ~ user_object.apellidos|slice(0, 1)|upper %}
+                                                
+                                                <div class="user-avatar-small">
+                                                    {{ initials | default('?') }}
                                                 </div>
-                                            {% else %}
-                                                <span class="text-muted">Sistema</span>
-                                            {% endif %}
+                                                <span class="user-name">
+                                                    {{ name_to_display }}
+                                                </span>
+                                            </div>
                                         </td>
                                         
                                         <td>
                                             <span class="date-badge">
-                                                <i class="far fa-calendar-alt"></i>
-                                                {{ tarea.fechaCreacion ? tarea.fechaCreacion|date('d/m/Y H:i') : 'N/A' }}
+                                                <i class="far fa-calendar-alt"></i> {{ item.fechaCreacion ? item.fechaCreacion|date('d/m/Y H:i') : 'N/A' }}
                                             </span>
                                         </td>
-                                        
                                         <td class="actions">
                                             <div class="table-actions-cell">
-                                                <a href="{{ path('app_edit_tarea', {'id': tarea.id}) }}" 
-                                                   class="action-btn-small action-btn-edit" 
-                                                   title="Editar tarea"
-                                                   data-bs-toggle="tooltip">
+                                                {# Usa los paths corregidos #}
+                                                <a href="{{ edit_path }}" class="action-btn-small action-btn-edit" title="Editar" data-bs-toggle="tooltip">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="{{ path('app_delete_tarea', {'id': tarea.id}) }}" 
-                                                   class="action-btn-small action-btn-delete" 
-                                                   title="Eliminar tarea"
-                                                   data-bs-toggle="tooltip"
-                                                   onclick="return confirm('¿Estás seguro de que quieres eliminar la tarea #{{ tarea.id }}?\n\nEsta acción no se puede deshacer.');">
+                                                <a href="{{ delete_path }}" class="action-btn-small action-btn-delete" title="Eliminar" data-bs-toggle="tooltip">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </div>
@@ -576,52 +606,50 @@
                                 {% set from_record = ((pagination.current_page - 1) * pagination.limit) + 1 %}
                                 {% set to_record = from_record + pagination.results|length - 1 %}
                                 {% set total_records = pagination.total_items %}
-                                Mostrando <strong>{{ from_record }}</strong> a <strong>{{ to_record }}</strong> 
-                                de <strong>{{ total_records }}</strong> registros
+                                Mostrando <strong>{{ from_record }}</strong> a <strong>{{ to_record }}</strong> de <strong>{{ total_records }}</strong> registros
                             </div>
-                            
                             <div class="pagination-controls">
-                                {% if pagination.current_page > 1 %}
-                                    <a href="?page=1{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                    <a href="?page={{ pagination.current_page - 1 }}{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
+                                {# Mantenemos el parámetro 'entity' en la paginación #}
+                                {% set limit_param = limit is defined and limit ? '&limit=' ~ limit : '' %}
+                                {% set base_query = '?entity=' ~ entity ~ limit_param %}
+                                
+                                {# Primera página #}
+                                <a href="{{ base_query ~ '&page=1' }}" class="page-btn {{ pagination.current_page == 1 ? 'disabled' : '' }}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+
+                                {# Anterior #}
+                                <a href="{{ base_query ~ '&page=' ~ (pagination.current_page - 1) }}" class="page-btn {{ pagination.current_page == 1 ? 'disabled' : '' }}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+
+                                {# Páginas (Solo se muestran 5 páginas alrededor de la actual) #}
+                                {% set start_page = (pagination.current_page - 2) > 0 ? pagination.current_page - 2 : 1 %}
+                                {% set end_page = (pagination.current_page + 2) < pagination.total_pages ? pagination.current_page + 2 : pagination.total_pages %}
+
+                                {% if start_page > 1 %}
+                                    <span class="page-btn disabled">...</span>
                                 {% endif %}
 
-                                {% set start_page = (pagination.current_page - 2) > 0 ? (pagination.current_page - 2) : 1 %}
-                                {% set end_page = (pagination.current_page + 2) < pagination.total_pages ? (pagination.current_page + 2) : pagination.total_pages %}
-                                
-                                {% for i in start_page..end_page %}
-                                    <a href="?page={{ i }}{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn {% if i == pagination.current_page %}page-btn-active{% endif %}">
-                                        {{ i }}
+                                {% for page in start_page..end_page %}
+                                    <a href="{{ base_query ~ '&page=' ~ page }}" class="page-btn {{ page == pagination.current_page ? 'page-btn-active' : '' }}">
+                                        {{ page }}
                                     </a>
                                 {% endfor %}
 
                                 {% if end_page < pagination.total_pages %}
-                                    {% if end_page < pagination.total_pages - 1 %}
-                                        <span class="page-btn disabled">…</span>
-                                    {% endif %}
-                                    <a href="?page={{ pagination.total_pages }}{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn">
-                                        {{ pagination.total_pages }}
-                                    </a>
+                                    <span class="page-btn disabled">...</span>
                                 {% endif %}
 
-                                {% if pagination.current_page < pagination.total_pages %}
-                                    <a href="?page={{ pagination.current_page + 1 }}{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                    <a href="?page={{ pagination.total_pages }}{% if limit %}&limit={{ limit }}{% endif %}" 
-                                       class="page-btn">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                {% endif %}
+                                {# Siguiente #}
+                                <a href="{{ base_query ~ '&page=' ~ (pagination.current_page + 1) }}" class="page-btn {{ pagination.current_page == pagination.total_pages ? 'disabled' : '' }}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+
+                                {# Última página #}
+                                <a href="{{ base_query ~ '&page=' ~ pagination.total_pages }}" class="page-btn {{ pagination.current_page == pagination.total_pages ? 'disabled' : '' }}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
                             </div>
                         </div>
                     {% endif %}
@@ -634,7 +662,7 @@
 {% block javascripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips
+            // Initialize tooltips (Requires Bootstrap JS)
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -656,7 +684,7 @@
             // Confirm delete with enhanced message
             document.querySelectorAll('.action-btn-delete').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
-                    if (!confirm('¿Estás seguro de que deseas eliminar esta tarea?\n\n⚠️ Esta acción no se puede deshacer.')) {
+                    if (!confirm('¿Estás seguro de que deseas eliminar este registro?\n\n⚠️ Esta acción no se puede deshacer.')) {
                         e.preventDefault();
                     }
                 });

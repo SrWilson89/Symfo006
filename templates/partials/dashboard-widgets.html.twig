@@ -1,15 +1,17 @@
 <div class="row">
-    <!-- Gráfico -->
     <div class="col-lg-8">
         <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Resumen de Actividad</h5>
+            </div>
             <div class="card-body" style="height: 400px;">
                 <canvas id="lineChart" style="width: 100%; height: 100%;"></canvas>
             </div>
         </div>
     </div>
-    <!-- Tarjetas -->
     <div class="col-lg-4">
         <div class="row">
+            <!-- Widget Soporte -->
             <div class="col-sm-12 mb-3">
                 <section class="card card-featured-left card-featured-primary">
                     <div class="card-body">
@@ -21,86 +23,96 @@
                             </div>
                             <div class="widget-summary-col">
                                 <div class="summary">
-                                    <h4 class="title">Atención al cliente</h4>
+                                    <h4 class="title">Soporte Activo</h4>
                                     <div class="info">
-                                        <strong class="amount">0</strong>
-                                        <span class="text-primary">(14 unread)</span>
+                                        <strong class="amount">{{ resume.customerSupport|default(0) }}</strong>
+                                        <span class="text-primary">({{ resume.unreadTickets|default(0) }} sin leer)</span>
                                     </div>
                                 </div>
                                 <div class="summary-footer">
-                                    <a class="text-muted text-uppercase" href="#">(view all)</a>
+                                    <a class="text-muted text-uppercase" href="#">(ver todos)</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
+
+            <!-- Widget Tareas Abiertas -->
             <div class="col-sm-12 mb-3">
                 <section class="card card-featured-left card-featured-secondary">
                     <div class="card-body">
                         <div class="widget-summary">
                             <div class="widget-summary-col widget-summary-col-icon">
                                 <div class="summary-icon bg-secondary">
-                                    <i class="fas fa-dollar-sign"></i>
+                                    <i class="fas fa-tasks"></i>
                                 </div>
                             </div>
                             <div class="widget-summary-col">
                                 <div class="summary">
-                                    <h4 class="title">Tareas abiertas</h4>
+                                    <h4 class="title">Tareas Abiertas</h4>
                                     <div class="info">
-                                        <strong class="amount">{{ resume.countopentasks }}</strong>
+                                        <strong class="amount">{{ resume.countopentasks|default(0) }}</strong>
+                                        {% if resume.overdueTasks|default(0) > 0 %}
+                                            <span class="text-danger">({{ resume.overdueTasks }} vencidas)</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="summary-footer">
-                                    <a class="text-muted text-uppercase" href="#">(withdraw)</a>
+                                    <a class="text-muted text-uppercase" href="#">(ver tareas)</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
+
+            <!-- Widget Ventas -->
             <div class="col-sm-12 mb-3">
                 <section class="card card-featured-left card-featured-tertiary">
                     <div class="card-body">
                         <div class="widget-summary">
                             <div class="widget-summary-col widget-summary-col-icon">
                                 <div class="summary-icon bg-tertiary">
-                                    <i class="fas fa-shopping-cart"></i>
+                                    <i class="fas fa-chart-line"></i>
                                 </div>
                             </div>
                             <div class="widget-summary-col">
                                 <div class="summary">
                                     <h4 class="title">Ventas</h4>
                                     <div class="info">
-                                        <strong class="amount">{{ resume.sales }}</strong>
+                                        <strong class="amount">€{{ resume.sales|default(0)|number_format(2, ',', '.') }}</strong>
                                     </div>
                                 </div>
                                 <div class="summary-footer">
-                                    <a class="text-muted text-uppercase" href="#">(statement)</a>
+                                    <a class="text-muted text-uppercase" href="#">(ver informe)</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
+
+            <!-- Widget Usuarios Online -->
             <div class="col-sm-12">
                 <section class="card card-featured-left card-featured-quaternary">
                     <div class="card-body">
                         <div class="widget-summary">
                             <div class="widget-summary-col widget-summary-col-icon">
                                 <div class="summary-icon bg-quaternary">
-                                    <i class="fas fa-user"></i>
+                                    <i class="fas fa-users"></i>
                                 </div>
                             </div>
                             <div class="widget-summary-col">
                                 <div class="summary">
-                                    <h4 class="title">Usuarios Online</h4>
+                                    <h4 class="title">Actividad</h4>
                                     <div class="info">
-                                        <strong class="amount">{{ resume.onlinePercentage }}%</strong>
+                                        <strong class="amount">{{ resume.onlinePercentage|default(0) }}%</strong>
+                                        <span class="text-muted">({{ resume.online|default(0) }} online)</span>
                                     </div>
                                 </div>
                                 <div class="summary-footer">
-                                    <a class="text-muted text-uppercase" href="#">(report)</a>
+                                    <a class="text-muted text-uppercase" href="#">(ver reporte)</a>
                                 </div>
                             </div>
                         </div>
@@ -110,48 +122,97 @@
         </div>
     </div>
 </div>
-<!-- Script del gráfico -->
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('lineChart').getContext('2d');
+    
+    // Datos por defecto en caso de que no lleguen del backend
+    const defaultData = {
+        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+        newCustomers: [0, 0, 0, 0, 0, 0],
+        newUsers: [0, 0, 0, 0, 0, 0],
+        sales: [0, 0, 0, 0, 0, 0]
+    };
+
+    const chartDataJson = '{{ resume.grafico is defined and resume.grafico ? resume.grafico|json_encode|e("js") : "" }}';
+    const chartData = chartDataJson ? JSON.parse(chartDataJson) : null;
+    const finalChartData = chartData ? chartData : defaultData;
+
     const lineChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ resume.grafico.labels|json_encode|raw }},
+            labels: finalChartData.labels,
             datasets: [
                 {
                     label: 'Clientes Registrados',
-                    data: {{ resume.grafico.newCustomers|json_encode|raw }},
+                    data: finalChartData.newCustomers,
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: false,
-                    tension: 0.1
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 },
                 {
                     label: 'Nuevos Usuarios',
-                    data: {{ resume.grafico.newUsers|json_encode|raw }},
+                    data: chartData.newUsers,
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: false,
-                    tension: 0.1
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 },
                 {
                     label: 'Ventas',
-                    data: {{ resume.grafico.sales|json_encode|raw }},
+                    data: chartData.sales,
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    fill: false,
-                    tension: 0.1
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'nearest'
             }
         }
     });
+});
 </script>
